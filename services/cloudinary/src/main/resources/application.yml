@@ -1,0 +1,10 @@
+spring:
+  config:
+    import: optional:configserver:http://localhost:8888
+  application:
+    name: cloudinary-service
+
+cloudinary:
+  cloud-name: my_cloud_name
+  api-key: my_api_key
+  api-secret: my_api_secret

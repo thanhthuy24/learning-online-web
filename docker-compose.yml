@@ -1,0 +1,68 @@
+services:
+  postgres:
+    container_name: ms_pg_sql
+    image: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: Admin123@
+      PGDATA: /var/lib/postgresql/data
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+    networks:
+      - microservices-net
+    restart: unless-stopped
+
+  pgadmin:
+    container_name: ms_pgadmin
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-pgadmin@padmin.org}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    volumes:
+      - pgadmin:/var/lib/pgadmin
+    ports:
+      - 5050:80
+    networks:
+      - microservices-net
+    restart: unless-stopped
+
+  mysql:
+    container_name: ms_mysql
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: Admin123@
+      MYSQL_DATABASE: elearningdb
+      MYSQL_USER: myuser
+      MYSQL_PASSWORD: mypassword
+    volumes:
+      - mysql_data:/var/lib/mysql
+    ports:
+      - 3307:3306
+    networks:
+      - microservices-net
+    restart: unless-stopped
+
+  cloudinary-service:
+    build: ./cloudinary-service
+    container_name: cloudinary-service
+    ports:
+      - "8082:8082"
+    environment:
+      CLOUDINARY_CLOUD_NAME: #my_cloud_name
+      CLOUDINARY_API_KEY: #my_api_key
+      CLOUDINARY_API_SECRET: #my_api_secret
+    networks:
+      - microservices-net
+
+
+networks:
+  microservices-net:
+    driver: bridge
+
+volumes:
+  postgres:
+  pgadmin:
+  mysql_data:
