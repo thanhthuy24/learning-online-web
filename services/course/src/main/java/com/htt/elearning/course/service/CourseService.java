@@ -2,6 +2,7 @@ package com.htt.elearning.course.service;
 
 import com.htt.elearning.course.dto.CourseDTO;
 import com.htt.elearning.course.pojo.Course;
+import com.htt.elearning.course.response.CourseResponse;
 import org.springframework.data.domain.*;
 
 import java.util.List;
@@ -21,4 +22,7 @@ public interface CourseService {
     List<Course> getCoursesByCategoryId(Long categoryId);
     Page<Course> getCoursesByCategoryIdPage(Pageable pageable, Long categoryId);
     Page<Course> getCoursesByPrice(Float minPrice, Float maxPrice, Pageable pageable);
+
+//    course - client
+    CourseResponse getCourseByIdClient(Long courseId);
 }

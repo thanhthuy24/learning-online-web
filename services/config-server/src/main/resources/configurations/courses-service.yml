@@ -18,3 +18,11 @@ spring:
     password: ${spring.datasource.password}
 server:
   port: 8050
+
+application:
+  config:
+    cloudinary-url: http://localhost:8080/api/cloudinary
+    user-url: http://localhost:8080/api/users
+    enrollment-url: http://localhost:8080/api/enrollments
+    progress-url: http://localhost:8080/api/progress
+    notification-url: http://localhost:8080/api/get-notification

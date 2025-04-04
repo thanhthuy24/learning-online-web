@@ -3,6 +3,7 @@ package com.htt.elearning.course.controller;
 import com.htt.elearning.course.dto.CourseDTO;
 import com.htt.elearning.course.pojo.Course;
 import com.htt.elearning.course.response.CourseListResponse;
+import com.htt.elearning.course.response.CourseResponse;
 import com.htt.elearning.course.service.CourseService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -192,5 +193,13 @@ public class ApiCourseController {
     public ResponseEntity<String> deleteCourse(@PathVariable Long courseId) {
         courseService.deleteCourse(courseId);
         return ResponseEntity.ok("delete course");
+    }
+
+//    course - client
+    @GetMapping("/get-courseId/{courseId}")
+    public CourseResponse getCourseByIdClient(
+            @PathVariable Long courseId
+    ) {
+        return courseService.getCourseByIdClient(courseId);
     }
 }

@@ -2,6 +2,7 @@ package com.htt.elearning.category.controller;
 
 import com.htt.elearning.category.dto.CategoryDTO;
 import com.htt.elearning.category.pojo.Category;
+import com.htt.elearning.category.response.CategoryResponse;
 import com.htt.elearning.category.service.CategoryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -22,9 +23,9 @@ public class ApiCategoryController {
     private CategoryService categoryService;
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<List<Category>> getAllCategories(
+    public ResponseEntity<List<CategoryResponse>> getAllCategories(
     ) {
-        List<Category> categories = categoryService.getAllCategories();
+        List<CategoryResponse> categories = categoryService.getAllCategories();
         return ResponseEntity.ok(categories);
     }
 

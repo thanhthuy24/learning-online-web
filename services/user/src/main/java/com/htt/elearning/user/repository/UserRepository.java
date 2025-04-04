@@ -1,6 +1,7 @@
 package com.htt.elearning.user.repository;
 
 import com.htt.elearning.user.pojo.User;
+import com.htt.elearning.user.response.UserResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,7 +14,7 @@ public interface UserRepository extends JpaRepository<User, Long>{
     boolean existsByEmail(String email);
     boolean existsByUsername(String username);
     Optional<User> findByUsername(String username);
-    User getUserByUsername(String username);
+    UserResponse getUserByUsername(String username);
 
     @Query("SELECT u FROM User u WHERE " +
             "LOWER(u.username) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
@@ -30,4 +31,8 @@ public interface UserRepository extends JpaRepository<User, Long>{
     Page<User> findUsersByRoleId(@Param("roleId") Long roleId, @Param("key") String key, Pageable pageable);
 
     Optional<User> findByGoogleAccount(String googleId);
+
+//    User - client
+    UserResponse getUserById(Long id);
+
 }

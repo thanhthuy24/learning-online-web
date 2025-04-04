@@ -1,5 +1,13 @@
 package com.htt.elearning.lesson.service;
 
+import com.htt.elearning.enrollment.EnrollmentClient;
+import com.htt.elearning.lesson.response.LessonResponse;
+import com.htt.elearning.notification.NotificationClient;
+import com.htt.elearning.notification.dto.NotificationDTO;
+import com.htt.elearning.notification.response.NotificationResponse;
+import com.htt.elearning.teacher.TeacherClient;
+import com.htt.elearning.teacher.response.TeacherResponse;
+import com.htt.elearning.user.UserClient;
 import com.htt.elearning.course.pojo.Course;
 import com.htt.elearning.course.repository.CourseRepository;
 import com.htt.elearning.lesson.dtos.LessonDTO;
@@ -8,15 +16,19 @@ import com.htt.elearning.lesson.dtos.LessonVideoIntro;
 import com.htt.elearning.lesson.exceptions.InvalidParamException;
 import com.htt.elearning.lesson.pojo.Lesson;
 import com.htt.elearning.lesson.repository.LessonRepository;
+import com.htt.elearning.user.response.UserResponse;
 import com.htt.elearning.video.dtos.VideoDTO;
 import com.htt.elearning.video.pojo.Video;
 import com.htt.elearning.video.repository.VideoRepository;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -27,10 +39,11 @@ public class LessonServiceImpl implements LessonService {
     private final LessonRepository lessonRepository;
     private final CourseRepository courseRepository;
     private final VideoRepository videoRepository;
-//    private final UserRepository userRepository;
-//    private final EnrollmentRepository enrollmentRepository;
-//    private final TeacherRepository teacherRepository;
-//    private final NotificationRepository notificationRepository;
+    private final UserClient userClient;
+    private final EnrollmentClient enrollmentClient;
+    private final TeacherClient teacherClient;
+    private final ModelMapper modelMapper;
+    private final NotificationClient notificationClient;
 
     @Override
     public Lesson createLesson(LessonDTO lessonDTO) {
@@ -45,18 +58,17 @@ public class LessonServiceImpl implements LessonService {
                 .course(existCourse)
                 .build();
 
-//        List<User> users = enrollmentRepository.findUsersByCourseId(lessonDTO.getCourseId());
-//        List<Notification> notifications = users.stream()
-//                .map(user -> Notification.builder()
-//                        .title("Khoá học " + existCourse.getName() + " bạn đang ký vừa có bài học mới!")
-//                        .message("Bài học mới: " + lessonDTO.getName() + ", hãy check ngay nào, " + user.getUsername() + " ơi!")
-//                        .user(user)
-//                        .isRead(false)
-//                        .createdDate(new Date())
-//                        .build()
-//                )
-//                .collect(Collectors.toList());
-//        notificationRepository.saveAll(notifications);
+        List<UserResponse> users = enrollmentClient.getUsersByCourseIdClient(lessonDTO.getCourseId());
+
+        users.forEach(user -> {
+            NotificationDTO notificationDTO = NotificationDTO.builder()
+                    .title("Khoá học " + existCourse.getName() + " bạn đang ký vừa có bài học mới!")
+                    .message("Bài học mới: " + lessonDTO.getName() + ", hãy check ngay nào, " + user.getUsername() + " ơi!")
+                    .userId(user.getId())
+                    .build();
+
+            notificationClient.createNotification(notificationDTO);
+        });
 
         return lessonRepository.save(newLesson);
     }
@@ -131,34 +143,32 @@ public class LessonServiceImpl implements LessonService {
 
     @Override
     public List<LessonVideoDTO> getLessonByCourseId(Long courseId) {
-//        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-//        Long role = userRepository.getUserByUsername(username).getRole().getId();
-//        Long userId = userRepository.getUserByUsername(username).getId();
+
+        Long userId = userClient.getUserIdByUsername();
+        Long role = userClient.getRoleIdClient();
+        if(role == 1) {
+            Boolean check = enrollmentClient.checkEnrollment(userId, courseId);
+            if (check == null || !check) {
+                throw new ResponseStatusException(
+                        HttpStatus.FORBIDDEN, "You must enroll this course first!!"
+                );
+            }
+        }
+        Course course = courseRepository.getCourseById(courseId);
+        Long ownerCourseId = course.getTeacherId();
+        TeacherResponse teacher = teacherClient.getTeacherById(userId);
+
+        if(role == 3) {
+            Long teacherId = teacher.getId();
+            if (ownerCourseId != teacherId) {
+                throw new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "You don't have permission to access this course!!"
+                );
+            }
+        }
 //
-//        if(role == 1) {
-//            Optional<Enrollment> checkEnrollment = enrollmentRepository.findByUserIdAndCourseId(userId, courseId);
-//            if (checkEnrollment.isEmpty()) {
-//                throw new ResponseStatusException(
-//                        HttpStatus.FORBIDDEN, "You must enroll this course first!!"
-//                );
-//            }
-//        }
-//        Course course = courseRepository.getCourseById(courseId);
-//        Long ownerCourseId = course.getTeacher().getId();
-//        Teacher teacher = teacherRepository.findByUserId(userId);
-//
-//        if(role == 3) {
-//            Long teacherId = teacher.getId();
-//            if (ownerCourseId != teacherId) {
-//                throw new ResponseStatusException(
-//                        HttpStatus.NOT_FOUND, "You don't have permission to access this course!!"
-//                );
-//            }
-//        }
-//
-//        List<Lesson> lessons = lessonRepository.findByCourseId(courseId);
-//        return lessons.stream().map(this::convertToDTO).collect(Collectors.toList());
-        return null;
+        List<Lesson> lessons = lessonRepository.findByCourseId(courseId);
+        return lessons.stream().map(this::convertToDTO).collect(Collectors.toList());
     }
 
     private LessonVideoDTO convertToDTO(Lesson lesson) {
@@ -230,5 +240,26 @@ public class LessonServiceImpl implements LessonService {
             return number;
         }
         return 0L;
+    }
+
+//    lesson - client
+
+    @Override
+    public LessonResponse getLessonByIdClient(Long id) {
+        Lesson lesson = lessonRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Cannot find lesson by id " + id));
+        return modelMapper.map(lesson, LessonResponse.class);
+    }
+
+    @Override
+    public List<LessonResponse> getLessonsByCourseIdClient(Long courseId) {
+        List<Lesson> lessons = lessonRepository.findByCourseId(courseId);
+        if (lessons == null || lessons.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return lessons.stream()
+                .map(lesson -> modelMapper.map(lesson, LessonResponse.class))
+                .collect(Collectors.toList());
     }
 }

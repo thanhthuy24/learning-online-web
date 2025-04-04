@@ -3,9 +3,11 @@ package com.htt.elearning.teacher.service;
 import com.htt.elearning.teacher.dto.TeacherDTO;
 import com.htt.elearning.teacher.pojo.Teacher;
 import com.htt.elearning.teacher.repository.TeacherRepository;
+import com.htt.elearning.teacher.response.TeacherResponse;
 import com.htt.elearning.user.pojo.User;
 import com.htt.elearning.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -19,6 +21,7 @@ import java.util.Optional;
 public class TeacherServiceImpl implements TeacherService {
     private final TeacherRepository teacherRepository;
     private final UserRepository userRepository;
+    private final ModelMapper modelMapper;
 
     @Override
     public Teacher createTeacher(TeacherDTO teacherDTO) {
@@ -39,6 +42,13 @@ public class TeacherServiceImpl implements TeacherService {
     public Teacher getTeacherById(Long id) {
         return teacherRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Can not find teacher by id: " + id));
+    }
+
+    @Override
+    public TeacherResponse getTeacherByIdClient(Long id) {
+        Teacher teacher = teacherRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Can not find teacher by id: " + id));
+        return modelMapper.map(teacher, TeacherResponse.class);
     }
 
     @Override

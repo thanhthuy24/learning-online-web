@@ -18,3 +18,13 @@ spring:
     password: ${spring.datasource.password}
 server:
   port: 8060
+
+application:
+  config:
+    user-url: http://localhost:8080/api/users
+    course-url: http://localhost:8080/api/courses
+    video-url: http://localhost:8080/api/videos
+    lesson-url: http://localhost:8080/api/lessons
+    video-completed-url: http://localhost:8080/api/video-completed
+
+

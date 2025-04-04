@@ -3,6 +3,7 @@ package com.htt.elearning.teacher.controller;
 import com.htt.elearning.teacher.dto.TeacherDTO;
 import com.htt.elearning.teacher.pojo.Teacher;
 import com.htt.elearning.teacher.response.TeacherListResponse;
+import com.htt.elearning.teacher.response.TeacherResponse;
 import com.htt.elearning.teacher.service.TeacherService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -99,4 +100,13 @@ public class ApiTeacherController {
         return ResponseEntity.ok(teacherService.getTeacherByUserId(userId));
     }
 
+//    teacher - client
+
+    @GetMapping("/{teacherId}/get-teacherId")
+    @ResponseStatus(HttpStatus.OK)
+    public TeacherResponse getTeacherClientById(
+            @PathVariable("teacherId") Long teacherId
+    ){
+        return teacherService.getTeacherByIdClient(teacherId);
+    }
 }

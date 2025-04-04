@@ -2,6 +2,7 @@ package com.htt.elearning.enrollment.service;
 
 import com.htt.elearning.enrollment.dtos.EnrollmentDTO;
 import com.htt.elearning.enrollment.pojo.Enrollment;
+import com.htt.elearning.user.response.UserResponse;
 
 import java.util.List;
 import java.util.Optional;
@@ -18,5 +19,8 @@ public interface EnrollmentService {
     Long countEnrollmentByUserId(Long userId);
 
 //    List<User> getEnrolledUsers(Long courseId);
-//    List<Long> getEnrolledUserIds(Long courseId);
+    List<Long> getEnrolledUserIds(Long courseId);
+
+//    enrollment - client
+    List<UserResponse> getUsersByCourseIdClient(Long courseId);
 }

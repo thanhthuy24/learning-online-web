@@ -5,6 +5,7 @@ import com.htt.elearning.lesson.dtos.LessonVideoDTO;
 import com.htt.elearning.lesson.dtos.LessonVideoIntro;
 import com.htt.elearning.lesson.exceptions.InvalidParamException;
 import com.htt.elearning.lesson.pojo.Lesson;
+import com.htt.elearning.lesson.response.LessonResponse;
 import com.htt.elearning.video.dtos.VideoDTO;
 import com.htt.elearning.video.pojo.Video;
 import org.springframework.data.domain.*;
@@ -26,4 +27,8 @@ public interface LessonService {
     Long countLessonInCourse(Long courseId);
 
     LessonVideoIntro getFirstLesson(Long courseId);
+
+//    lesson - client
+    LessonResponse getLessonByIdClient(Long lessonId);
+    List<LessonResponse> getLessonsByCourseIdClient(Long courseId);
 }

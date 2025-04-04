@@ -3,3 +3,27 @@ spring:
     import: optional:configserver:http://localhost:8888
   application:
     name: user-service
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id:
+            client-secret:
+            redirect-uri: ${GOOGLE_REDIRECT_URI:http://localhost:8082/auth/google/callback}
+        provider:
+          google:
+            user-info-uri: https://www.googleapis.com/oauth2/v3/userinfo
+        resource-server:
+          opaque-token:
+            introspection-uri:
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 20MB
+
+jwt:
+  expiration: 2592000
+  secretKey:
+
+

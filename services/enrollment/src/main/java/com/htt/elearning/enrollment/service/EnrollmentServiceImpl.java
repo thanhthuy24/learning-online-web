@@ -1,13 +1,19 @@
 package com.htt.elearning.enrollment.service;
 
+import com.htt.elearning.course.CourseClient;
+import com.htt.elearning.course.response.CourseResponse;
 import com.htt.elearning.enrollment.dtos.EnrollmentDTO;
 import com.htt.elearning.enrollment.pojo.Enrollment;
 import com.htt.elearning.enrollment.repository.EnrollmentRepository;
+import com.htt.elearning.progress.service.ProgressService;
+import com.htt.elearning.user.UserClient;
+import com.htt.elearning.user.response.UserResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,9 +21,9 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class EnrollmentServiceImpl implements EnrollmentService {
     private final EnrollmentRepository enrollmentRepository ;
-//    private final CourseRepository courseRepository;
-//    private final UserRepository userRepository;
-//    private final ProgressService progressService;
+    private final CourseClient courseClient;
+    private final UserClient userClient;
+    private final ProgressService progressService;
 
     @Override
     public Boolean checkEnrolled(Long userId, Long courseId) {
@@ -35,64 +41,58 @@ public class EnrollmentServiceImpl implements EnrollmentService {
 
     @Override
     public List<Enrollment> getEnrollmentByUser() {
-//        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-//        User user = userRepository.getUserByUsername(username);
-//
-//        List<Enrollment> enrollments = enrollmentRepository.findByUserId(user.getId());
-//        return enrollments;
-        return null;
+        Long userId = userClient.getUserIdByUsername();
+        List<Enrollment> enrollments = enrollmentRepository.findByUserId(userId);
+        return enrollments;
     }
+
     @Override
     public List<Enrollment> getCousesEnrolledByUser(Long userId) {
-//        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-//        Long role = userRepository.getUserByUsername(username).getRole().getId();
-//        if (role != 2){
-//            throw new ResponseStatusException(
-//                    HttpStatus.FORBIDDEN, "Authorization!!"
-//            );
-//        }
-//        return enrollmentRepository.findByUserId(userId);
-        return null;
+        Long role = userClient.getRoleIdClient();
+        if (role != 2){
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN, "Authorization!!"
+            );
+        }
+        return enrollmentRepository.findByUserId(userId);
     }
 
     @Override
     public Enrollment createEnrollment(EnrollmentDTO enrollmentDTO) {
-//        Course existingCourse = courseRepository.findById(enrollmentDTO.getCourseId())
-//                .orElseThrow(() -> new ResponseStatusException(
-//                        HttpStatus.NOT_FOUND, "Cannot find course with id " + enrollmentDTO.getCourseId()));
-//
-//        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-//        User user1 = userRepository.getUserByUsername(username);
-//
-//        Optional<Enrollment> enrollments = enrollmentRepository.findByUserIdAndCourseId(user1.getId(), enrollmentDTO.getCourseId());
-//        if (!enrollments.isEmpty()) {
-//            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "This course had in your list course!!");
-//        }
-//
-//        Enrollment enrollment = Enrollment.builder()
-//                .course(existingCourse)
-//                .user(user1)
-//                .build();
-//        enrollmentRepository.save(enrollment);
-//
-//        progressService.calculateProgress(existingCourse.getId());
-//
-//        return enrollment;
-        return null;
+        CourseResponse existingCourse = courseClient.getCourseByIdClient(enrollmentDTO.getCourseId());
+        if (existingCourse == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Cannot find course with id "
+                    + enrollmentDTO.getCourseId());
+        }
+        Long userId = userClient.getUserIdByUsername();
+
+        Optional<Enrollment> enrollments = enrollmentRepository.findByUserIdAndCourseId(
+                userId, enrollmentDTO.getCourseId());
+        if (!enrollments.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "This course had in your list course!!");
+        }
+
+        Enrollment enrollment = Enrollment.builder()
+                .courseId(existingCourse.getId())
+                .userId(userId)
+                .build();
+        enrollmentRepository.save(enrollment);
+
+        progressService.calculateProgress(existingCourse.getId());
+
+        return enrollment;
     }
 
     @Override
     public Long countEnrollmentByUserId(Long userId) {
-//        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-//        Long role = userRepository.getUserByUsername(username).getRole().getId();
-//        if (role != 2){
-//            throw new ResponseStatusException(
-//                    HttpStatus.FORBIDDEN, "Authorization!!"
-//            );
-//        }
-//
-//        return enrollmentRepository.countEnrollmentByUserId(userId);
-        return null;
+        Long role = userClient.getRoleIdClient();
+        if (role != 2){
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN, "Authorization!!"
+            );
+        }
+
+        return enrollmentRepository.countEnrollmentByUserId(userId);
     }
 
 //    @Override
@@ -101,21 +101,36 @@ public class EnrollmentServiceImpl implements EnrollmentService {
 //        return enrollments.stream().map(Enrollment::getUser).collect(Collectors.toList());
 //    }
 
-//    @Override
-//    public List<Long> getEnrolledUserIds(Long courseId) {
-//        return enrollmentRepository.findAllEnrollmentByCourseId(courseId);
-//    }
+    @Override
+    public List<Long> getEnrolledUserIds(Long courseId) {
+        return enrollmentRepository.findAllEnrollmentByCourseId(courseId);
+    }
 
     @Override
     public Long getCountEnrollmentByCourseId(Long courseId) {
-//        Course existingCourse = courseRepository.findById(courseId)
-//                .orElseThrow(() -> new ResponseStatusException(
-//                        HttpStatus.NOT_FOUND, "Cannot find course with id " + courseId));
-//
-//        Long count = enrollmentRepository.countEnrollmentByCourseId(existingCourse.getId());
-//        if (count != null) {
-//            return count;
-//        }
+        CourseResponse existingCourse = courseClient.getCourseByIdClient(courseId);
+        if (existingCourse == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Cannot find course with id "
+                    + courseId);
+        }
+
+        Long count = enrollmentRepository.countEnrollmentByCourseId(existingCourse.getId());
+        if (count != null) {
+            return count;
+        }
         return 0L;
     }
+
+//    enrollment - client
+    @Override
+    public List<UserResponse> getUsersByCourseIdClient(Long courseId) {
+        List<Long> list = enrollmentRepository.findUsersByCourseId(courseId);
+        List<UserResponse> userResponseList = new ArrayList<>();
+        for (Long userId : list) {
+            UserResponse u = userClient.getUserByIdClient(userId);
+            userResponseList.add(u);
+        }
+        return userResponseList;
+    }
+
 }

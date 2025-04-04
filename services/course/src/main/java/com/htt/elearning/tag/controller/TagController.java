@@ -2,6 +2,7 @@ package com.htt.elearning.tag.controller;
 
 import com.htt.elearning.tag.dto.TagDTO;
 import com.htt.elearning.tag.pojo.Tag;
+import com.htt.elearning.tag.response.TagResponse;
 import com.htt.elearning.tag.service.TagService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,11 @@ public class TagController {
     public ResponseEntity<List<Tag>> getAllTags() {
         List<Tag> getAllTags = tagService.getAllTags();
         return ResponseEntity.ok(getAllTags);
+    }
+
+    @GetMapping("/{tagId}")
+    public TagResponse getTagById(@PathVariable Long tagId) {
+        return tagService.getTagById(tagId);
     }
 
     @PostMapping("")

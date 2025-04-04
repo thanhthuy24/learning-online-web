@@ -2,12 +2,17 @@ package com.htt.elearning.course.service;
 
 import com.htt.elearning.category.pojo.Category;
 import com.htt.elearning.category.repository.CategoryRepository;
+import com.htt.elearning.course.response.CourseResponse;
+import com.htt.elearning.teacher.TeacherClient;
+import com.htt.elearning.teacher.response.TeacherResponse;
+import com.htt.elearning.user.UserClient;
 import com.htt.elearning.course.dto.CourseDTO;
 import com.htt.elearning.course.pojo.Course;
 import com.htt.elearning.course.repository.CourseRepository;
 import com.htt.elearning.tag.pojo.Tag;
 import com.htt.elearning.tag.repository.TagRepository;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -23,6 +28,9 @@ public class CourseServiceImpl implements CourseService {
     private final CategoryRepository categoryRepository;
     private final CourseRepository courseRepository;
     private final TagRepository tagRepository;
+    private final TeacherClient teacherClient;
+    private final UserClient userClient;
+    private final ModelMapper modelMapper;
 
     @Override
     public Course createCourse(CourseDTO courseDTO) {
@@ -36,10 +44,9 @@ public class CourseServiceImpl implements CourseService {
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND, "Can not find tag by id: " + courseDTO.getTagId()));
 
-//        Teacher existTeacher = teacherRepository
-//                .findById(courseDTO.getTeacherId())
-//                .orElseThrow(() -> new ResponseStatusException(
-//                        HttpStatus.NOT_FOUND, "Can not find teacher by id: " + courseDTO.getTeacherId()));
+        TeacherResponse existingTeacher = Optional.ofNullable(teacherClient.getTeacherById(courseDTO.getTeacherId()))
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Can not find teacher with id: " + courseDTO.getCategoryId()));
 
         Course newCourse = Course.builder()
                 .name(courseDTO.getName())
@@ -78,9 +85,9 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public List<Course> getCoursesByCategoryId(Long categoryId) {
-//        Category existingCate = categoryRepository.findById(categoryId)
-//                .orElseThrow(() -> new ResponseStatusException(
-//                        HttpStatus.NOT_FOUND, "Can not find category by id: " + categoryId));
+        Category existingCate = categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Can not find category by id: " + categoryId));
         if (categoryId != null) {
             return courseRepository.findByCategoryId(categoryId);
         }
@@ -111,17 +118,21 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public Page<Course> getCoursesByTeacherId(Long teacherId, Pageable pageable) {
-        return null;
+//        return null;
 //        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+//        String username = userClient.getUsername();
 //        Long userId = userRepository.getUserByUsername(username).getId();
-//
-//        Teacher existingTeacher = teacherRepository.findById(teacherId)
-//                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Can not find teacher with id: " + teacherId));
-//
-//        if (existingTeacher.getUser().getId() != userId) {
-//            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Forbidden");
-//        }
-//        return courseRepository.findByTeacherId(teacherId, pageable);
+        Long userId = userClient.getUserIdByUsername();
+
+
+        TeacherResponse existingTeacher = Optional.ofNullable(teacherClient.getTeacherById(teacherId))
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Can not find teacher with id: " + teacherId));
+
+        if (existingTeacher.getUserId() != userId) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Forbidden");
+        }
+        return courseRepository.findByTeacherId(teacherId, pageable);
 
     }
 
@@ -136,9 +147,10 @@ public class CourseServiceImpl implements CourseService {
                     .orElseThrow(() -> new ResponseStatusException(
                             HttpStatus.NOT_FOUND, "Can not find category by id: " + courseDTO.getCategoryId()));
 
-//            Teacher existTeacher = teacherRepository.findById(courseDTO.getTeacherId())
-//                    .orElseThrow(() -> new ResponseStatusException(
-//                            HttpStatus.NOT_FOUND, "Can not find teacher by id: " + courseDTO.getTeacherId()));
+            TeacherResponse existingTeacher = Optional.ofNullable(teacherClient.getTeacherById(courseDTO.getTeacherId()))
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                            "Can not find teacher with id: " + courseDTO.getCategoryId()));
+
             existingCourse.setName(courseDTO.getName());
             existingCourse.setDescription(courseDTO.getDescription());
             existingCourse.setPrice(courseDTO.getPrice());
@@ -162,5 +174,15 @@ public class CourseServiceImpl implements CourseService {
     @Override
     public boolean existByName(String name) {
         return courseRepository.existsByName(name);
+    }
+
+//    course - client
+    @Override
+    public CourseResponse getCourseByIdClient(Long courseId){
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Can not find course with id : " + courseId));
+
+        return modelMapper.map(course, CourseResponse.class);
     }
 }

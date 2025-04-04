@@ -4,6 +4,7 @@ import com.htt.elearning.lesson.dtos.LessonDTO;
 import com.htt.elearning.lesson.dtos.LessonVideoDTO;
 import com.htt.elearning.lesson.pojo.Lesson;
 import com.htt.elearning.lesson.response.LessonListResponse;
+import com.htt.elearning.lesson.response.LessonResponse;
 import com.htt.elearning.lesson.service.LessonService;
 import com.htt.elearning.video.dtos.VideoDTO;
 import com.htt.elearning.video.pojo.Video;
@@ -228,5 +229,22 @@ public class ApiLessonController {
             @PathVariable Long courseId
     ){
         return ResponseEntity.ok(lessonService.getFirstLesson(courseId));
+    }
+
+//    lesson - client
+    @GetMapping("/get-lesson/{lessonId}")
+    @ResponseStatus(HttpStatus.OK)
+    public LessonResponse getLessonByIdClient(
+            @PathVariable Long lessonId
+    ) {
+        return lessonService.getLessonByIdClient(lessonId);
+    }
+
+    @GetMapping("/get-list-lessons/{courseId}")
+    @ResponseStatus(HttpStatus.OK)
+    public List<LessonResponse> getListLessonsByCourseIdClient(
+            @PathVariable Long courseId
+    ) {
+        return lessonService.getLessonsByCourseIdClient(courseId);
     }
 }

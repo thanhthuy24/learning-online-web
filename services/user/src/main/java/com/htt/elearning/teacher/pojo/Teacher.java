@@ -8,7 +8,7 @@ import lombok.*;
 @Getter
 @Setter
 @Entity
-//@Table(name = "teacher")
+@Table(name = "teacher", schema = "elearningdb")
 @Builder
 @Data
 @AllArgsConstructor

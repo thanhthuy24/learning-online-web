@@ -2,6 +2,7 @@ package com.htt.elearning.teacher.service;
 
 import com.htt.elearning.teacher.dto.TeacherDTO;
 import com.htt.elearning.teacher.pojo.Teacher;
+import com.htt.elearning.teacher.response.TeacherResponse;
 import org.springframework.data.domain.*;
 
 import java.util.List;
@@ -15,4 +16,7 @@ public interface TeacherService {
     void deleteTeacher(Long id);
     Teacher getTeacherByUserId(Long userId);
     List<Teacher> getAll();
+
+//    techer-client
+    TeacherResponse getTeacherByIdClient(Long id);
 }

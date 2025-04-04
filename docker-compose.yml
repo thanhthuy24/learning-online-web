@@ -35,8 +35,8 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: Admin123@
       MYSQL_DATABASE: elearningdb
-      MYSQL_USER: myuser
-      MYSQL_PASSWORD: mypassword
+      MYSQL_USER: root
+      MYSQL_PASSWORD: Admin123@
     volumes:
       - mysql_data:/var/lib/mysql
     ports:
@@ -45,17 +45,34 @@ services:
       - microservices-net
     restart: unless-stopped
 
-  cloudinary-service:
-    build: ./cloudinary-service
-    container_name: cloudinary-service
-    ports:
-      - "8082:8082"
-    environment:
-      CLOUDINARY_CLOUD_NAME: #my_cloud_name
-      CLOUDINARY_API_KEY: #my_api_key
-      CLOUDINARY_API_SECRET: #my_api_secret
-    networks:
-      - microservices-net
+#  zookeeper:
+#    image: confluentinc/cp-zookeeper:latest
+#    container_name: zookeeper
+#    environment:
+#      ZOOKEEPER_SERVER_ID: 1
+#      ZOOKEEPER_CLIENT_PORT: 2181
+#      ZOOKEEPER_TICK_TIME: 2000
+#    ports:
+#      - 22181:2181
+#    networks:
+#      - microservices-net
+#
+#  kafka:
+#    image: confluentinc/cp-kafka:latest
+#    container_name: ms_kafka
+#    ports:
+#      - 9092:9092
+#    depends_on:
+#      - zookeeper
+#    environment:
+#      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+#      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+#      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+#      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+#      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+#      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+#    networks:
+#      - microservices-net
 
 
 networks:
