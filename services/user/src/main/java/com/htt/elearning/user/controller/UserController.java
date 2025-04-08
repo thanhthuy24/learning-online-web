@@ -359,4 +359,10 @@ public class UserController {
         return userService.updateRole(userId);
     }
 
+    @GetMapping("/get-users-keyword")
+    public List<Long> searchUserIdsByKeywordClient(
+            @RequestParam("keyword") String keyword
+    ){
+        return userService.searchUserIdsByKeyword(keyword);
+    }
 }

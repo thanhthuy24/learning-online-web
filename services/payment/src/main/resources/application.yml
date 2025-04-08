@@ -3,3 +3,21 @@ spring:
     import: optional:configserver:http://localhost:8888
   application:
     name: payment-service
+
+momo:
+  partnerCode: MOMO
+  accessKey: #accessKey
+  secretKey: #secretKey
+  redirectUrl: http://localhost:8080/momo/return
+  endpoint: https://test-payment.momo.vn/gw_payment/transactionProcessor
+
+paypal:
+  client:
+    id: #id
+    secret: #secret
+  mode: sandbox
+
+
+
+
+

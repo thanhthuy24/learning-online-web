@@ -1,5 +1,6 @@
 package com.htt.elearning.enrollment;
 
+import com.htt.elearning.user.response.UserResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,8 +19,13 @@ public interface EnrollmentClient {
             @RequestParam Long courseId
     );
 
+    @GetMapping("/get-userIds/{courseId}")
+    List<Long> getUserIdsByCourseIdClient(
+            @PathVariable Long courseId
+    );
+
     @GetMapping("/get-users/{courseId}")
-    List<Long> getUsersByCourseIdClient(
+    List<UserResponse> getUsersByCourseIdClient(
             @PathVariable Long courseId
     );
 }

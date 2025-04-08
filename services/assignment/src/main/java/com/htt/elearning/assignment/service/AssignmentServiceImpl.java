@@ -8,17 +8,21 @@ import com.htt.elearning.course.CourseClient;
 import com.htt.elearning.course.response.CourseResponse;
 import com.htt.elearning.enrollment.EnrollmentClient;
 import com.htt.elearning.exceptions.DataNotFoundException;
+import com.htt.elearning.kafka.AssignmentCreateEvent;
+import com.htt.elearning.kafka.AssignmentProducer;
 import com.htt.elearning.lesson.LessonClient;
 import com.htt.elearning.lesson.response.LessonResponse;
 import com.htt.elearning.tag.TagClient;
 import com.htt.elearning.tag.response.TagResponse;
 import com.htt.elearning.user.UserClient;
+import com.htt.elearning.user.response.UserResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -30,6 +34,7 @@ public class AssignmentServiceImpl implements AssignmentService {
     private final TagClient tagClient;
     private final UserClient userClient;
     private final EnrollmentClient enrollmentClient;
+    private final AssignmentProducer assignmentProducer;
 
     @Override
     public Page<AssignmentResponse> getAllAssignment(PageRequest pageRequest) {
@@ -69,7 +74,19 @@ public class AssignmentServiceImpl implements AssignmentService {
                 .lessonId(assignmentDTO.getLessonId())
                 .dueDate(assignmentDTO.getDueDate())
                 .build();
-        assignmentRepository.save(newAssignment);
+
+        List<UserResponse> users = enrollmentClient.getUsersByCourseIdClient(assignmentDTO.getCourseId());
+
+        Assignment saveAssignment = assignmentRepository.save(newAssignment);
+
+        assignmentProducer.sendLessonCreateEvent(
+                AssignmentCreateEvent.builder()
+                        .id(saveAssignment.getId())
+                        .name(saveAssignment.getName())
+                        .courseId(saveAssignment.getCourseId())
+                        .courseName(existCourse.getName())
+                        .createdAt(new Date())
+                .build());
 
         return newAssignment;
     }

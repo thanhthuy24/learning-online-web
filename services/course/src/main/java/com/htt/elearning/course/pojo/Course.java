@@ -20,9 +20,11 @@ import java.util.Date;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@EntityListeners(CourseListerner.class)
 public class Course {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "course_seq")
+    @SequenceGenerator(name = "course_seq", sequenceName = "course_id_seq", allocationSize = 1)
     @Column(name = "id", nullable = false)
     private Long id;
 

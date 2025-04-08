@@ -3,6 +3,7 @@ package com.htt.elearning.course.service;
 import com.htt.elearning.course.dto.CourseDTO;
 import com.htt.elearning.course.pojo.Course;
 import com.htt.elearning.course.response.CourseResponse;
+import com.htt.elearning.course.response.CourseResponseRedis;
 import org.springframework.data.domain.*;
 
 import java.util.List;
@@ -25,4 +26,7 @@ public interface CourseService {
 
 //    course - client
     CourseResponse getCourseByIdClient(Long courseId);
+    List<Long> searchCourseIdsByNameClient(String keyword);
+
+    Page<CourseResponseRedis> getAllCoursesRedisClient(Pageable pageable, String keyword, Long categoryId);
 }

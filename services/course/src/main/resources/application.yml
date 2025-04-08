@@ -2,8 +2,14 @@ spring:
   config:
     import: optional:configserver:http://localhost:8888
   application:
-    name: courses-service
+    name: COURSES-SERVICE
+  data:
+    redis:
+      port: 6379
+      host: localhost
+      use-redis-cache: true
 
 python:
   api:
     url: http://127.0.0.1:5000
+

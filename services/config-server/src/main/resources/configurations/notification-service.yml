@@ -11,11 +11,23 @@ spring:
       ddl-auto: update
     show-sql: true
 
+  kafka:
+    consumer:
+      bootstrap-servers: localhost:9092
+#      group-id: lessonGroup
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: '*'
+        spring.json.type.mapping: notification:com.htt.elearning.notification.pojo.Notification
+
+
 server:
   port: 8092
 
 application:
   config:
-    enrollment-url: http://localhost:8080/api/enrollments
-    user-url: http://localhost:8080/api/users
-    token-url: http://localhost:8080/api/token
+    enrollment-url: http://localhost:8096/api/enrollments
+    user-url: http://localhost:8096/api/users
+    token-url: http://localhost:8096/api/token

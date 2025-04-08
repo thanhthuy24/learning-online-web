@@ -1,12 +1,19 @@
 package com.htt.elearning.course.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.htt.elearning.cloudinary.CloudinaryClient;
 import com.htt.elearning.course.dto.CourseDTO;
 import com.htt.elearning.course.pojo.Course;
 import com.htt.elearning.course.response.CourseListResponse;
 import com.htt.elearning.course.response.CourseResponse;
+import com.htt.elearning.course.response.CourseResponseRedis;
+import com.htt.elearning.course.response.CourseResponseRedisList;
+import com.htt.elearning.course.service.CourseRedisService;
 import com.htt.elearning.course.service.CourseService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -20,11 +27,14 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("api/courses")
+@RequestMapping("/api/courses")
 @RequiredArgsConstructor
 public class ApiCourseController {
-//    private final CloudinaryService cloudinaryService;
+    private final CloudinaryClient cloudinaryClient;
     private final CourseService courseService;
+    private static final Logger logger = LoggerFactory.getLogger(ApiCourseController.class);
+    private final CourseRedisService courseRedisService;
+
     //hien thi tat ca courses
     @GetMapping("")
     @ResponseStatus(HttpStatus.OK)
@@ -165,9 +175,8 @@ public class ApiCourseController {
     }
 
     private String storeFile(MultipartFile file) throws IOException {
-//        Map<String, Object> uploadResult = cloudinaryService.uploadFile(file);
-//        return uploadResult.get("url").toString();
-        return null;
+        Map<String, Object> uploadResult = cloudinaryClient.uploadFileImage(file);
+        return uploadResult.get("url").toString();
     }
 
     @PutMapping("/{courseId}")
@@ -201,5 +210,56 @@ public class ApiCourseController {
             @PathVariable Long courseId
     ) {
         return courseService.getCourseByIdClient(courseId);
+    }
+
+    @GetMapping("/get-courses-keyword")
+    public List<Long> getCoursesByKeywordClient(String keyword) {
+        return courseService.searchCourseIdsByNameClient(keyword);
+    }
+
+    @GetMapping("/get-all-courses-redis")
+    public ResponseEntity<CourseResponseRedisList> getAllCourseRedis(
+            @RequestParam(defaultValue = "") String keyword,
+            @RequestParam(defaultValue = "0", name = "category_id") Long categoryId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int limit
+    ) throws JsonProcessingException {
+        int totalPages = 0;
+        courseRedisService.clear();
+        // Tạo Pageable từ thông tin trang và giới hạn
+        PageRequest pageRequest = PageRequest.of(
+                page, limit,
+                Sort.by("id").descending()
+        );
+        logger.info(String.format("keyword = %s, category_id = %d, page = %d, limit = %d",
+                keyword, categoryId, page, limit));
+        List<CourseResponseRedis> courseResponseRedis = courseRedisService
+                .getAllCourses(pageRequest, categoryId, keyword);
+        if (courseResponseRedis!=null && !courseResponseRedis.isEmpty()) {
+            totalPages = courseResponseRedis.get(0).getTotalPages();
+        }
+        if(courseResponseRedis == null) {
+            Page<CourseResponseRedis> coursePage = courseService
+                    .getAllCoursesRedisClient(pageRequest, keyword, categoryId);
+            // Lấy tổng số trang
+            totalPages = coursePage.getTotalPages();
+            courseResponseRedis = coursePage.getContent();
+            // Bổ sung totalPages vào các đối tượng ProductResponse
+            for (CourseResponseRedis course : courseResponseRedis) {
+                course.setTotalPages(totalPages);
+            }
+            courseRedisService.saveAllCourses(
+                    courseResponseRedis,
+                    pageRequest,
+                    categoryId,
+                    keyword
+            );
+        }
+        CourseResponseRedisList courseResponseRedisList = CourseResponseRedisList
+                .builder()
+                .courses(courseResponseRedis)
+                .totalPages(totalPages)
+                .build();
+        return ResponseEntity.ok(courseResponseRedisList);
     }
 }

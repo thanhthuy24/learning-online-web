@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, Long>{
@@ -35,4 +36,7 @@ public interface UserRepository extends JpaRepository<User, Long>{
 //    User - client
     UserResponse getUserById(Long id);
 
+    @Query("SELECT r.id FROM User r WHERE " +
+            "LOWER(r.username) LIKE LOWER(CONCAT('%', :keyword, '%'))")
+    List<Long> searchUserIdsByKeyword(@Param("keyword") String keyword);
 }

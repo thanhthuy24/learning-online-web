@@ -27,7 +27,7 @@ public class Tag {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @OneToMany(mappedBy = "tag", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Course> courses = new LinkedHashSet<>();
+//    @OneToMany(mappedBy = "tag", cascade = CascadeType.ALL, orphanRemoval = true)
+//    private Set<Course> courses = new LinkedHashSet<>();
 
 }

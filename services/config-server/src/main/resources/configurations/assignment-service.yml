@@ -16,13 +16,21 @@ spring:
     baseline-version: 0
     user: ${spring.datasource.username}
     password: ${spring.datasource.password}
+  kafka:
+    producer:
+      bootstrap-servers: localhost:9092
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        spring.json.type.mapping: assignment:com.htt.elearning.lesson.pojo.Assignment
+
 server:
   port: 8070
 
 application:
   config:
-    user-url: http://localhost:8080/api/users
-    course-url: http://localhost:8080/api/courses
-    tag-url: http://localhost:8080/api/tags
-    enrollment-url: http://localhost:8080/api/enrollments
-    lesson-url: http://localhost:8080/api/lessons
+    user-url: http://localhost:8096/api/users
+    course-url: http://localhost:8096/api/courses
+    tag-url: http://localhost:8096/api/tags
+    enrollment-url: http://localhost:8096/api/enrollments
+    lesson-url: http://localhost:8096/api/lessons

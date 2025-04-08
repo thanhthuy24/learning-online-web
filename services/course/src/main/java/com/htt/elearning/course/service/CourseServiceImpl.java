@@ -3,6 +3,7 @@ package com.htt.elearning.course.service;
 import com.htt.elearning.category.pojo.Category;
 import com.htt.elearning.category.repository.CategoryRepository;
 import com.htt.elearning.course.response.CourseResponse;
+import com.htt.elearning.course.response.CourseResponseRedis;
 import com.htt.elearning.teacher.TeacherClient;
 import com.htt.elearning.teacher.response.TeacherResponse;
 import com.htt.elearning.user.UserClient;
@@ -21,6 +22,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -184,5 +186,16 @@ public class CourseServiceImpl implements CourseService {
                         HttpStatus.NOT_FOUND, "Can not find course with id : " + courseId));
 
         return modelMapper.map(course, CourseResponse.class);
+    }
+
+    @Override
+    public List<Long> searchCourseIdsByNameClient(String keyword){
+        return courseRepository.searchCourseIdsByName(keyword);
+    }
+
+    @Override
+    public Page<CourseResponseRedis> getAllCoursesRedisClient(Pageable pageable, String keyword, Long categoryId) {
+        Page<Course> courses = courseRepository.searchCoursesRedis(categoryId, keyword, pageable);
+        return courses.map(CourseResponseRedis::fromCourse);
     }
 }

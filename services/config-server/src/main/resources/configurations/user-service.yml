@@ -16,4 +16,4 @@ server:
 
 application:
   config:
-    cloudinary-url: http://localhost:8080/api/cloudinary
+    cloudinary-url: http://localhost:8096/api/cloudinary

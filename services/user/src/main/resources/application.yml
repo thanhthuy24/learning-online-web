@@ -8,15 +8,15 @@ spring:
       client:
         registration:
           google:
-            client-id:
-            client-secret:
+            client-id: #client-id
+            client-secret: #client-secret
             redirect-uri: ${GOOGLE_REDIRECT_URI:http://localhost:8082/auth/google/callback}
         provider:
           google:
             user-info-uri: https://www.googleapis.com/oauth2/v3/userinfo
         resource-server:
           opaque-token:
-            introspection-uri:
+            introspection-uri: https://googleapis.com
   servlet:
     multipart:
       max-file-size: 20MB
@@ -24,6 +24,6 @@ spring:
 
 jwt:
   expiration: 2592000
-  secretKey:
+  secretKey: #secretKey
 
 

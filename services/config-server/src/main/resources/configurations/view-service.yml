@@ -21,5 +21,5 @@ server:
 
 application:
   config:
-    user-url: http://localhost:8080/api/users
-    course-url: http://localhost:8080/api/courses
+    user-url: http://localhost:8096/api/users
+    course-url: http://localhost:8096/api/courses

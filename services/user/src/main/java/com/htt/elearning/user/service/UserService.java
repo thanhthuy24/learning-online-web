@@ -7,6 +7,7 @@ import com.htt.elearning.user.pojo.User;
 import com.htt.elearning.user.response.UserResponse;
 import org.springframework.data.domain.*;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface UserService {
@@ -36,4 +37,5 @@ public interface UserService {
     UserResponse getUserByUsernameClient(String username);
     UserResponse getUserByUserIdClient(Long userId);
     UserResponse updateRole(Long userId);
+    List<Long> searchUserIdsByKeyword(String keyword);
 }

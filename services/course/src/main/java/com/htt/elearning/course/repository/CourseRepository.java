@@ -12,6 +12,11 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
     @Query("SELECT c FROM Course c WHERE " +
             "LOWER(c.name) LIKE LOWER(CONCAT('%', :keyword, '%'))")
     List<Course> searchByKeyword(@Param("keyword") String keyword);
+
+    @Query("SELECT c FROM Course c WHERE " +
+            "LOWER(c.name) LIKE LOWER(CONCAT('%', :keyword, '%'))")
+    List<Long> searchCourseIdsByName(@Param("keyword") String keyword);
+
     boolean existsByName(String name);
     Page<Course> findAll(Pageable pageable); //phân trang
 
@@ -28,6 +33,13 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
     Page<Course>  getCoursesByPrice(@Param("minPrice") Float minPrice, @Param("maxPrice") Float maxPrice, Pageable pageable);
 //    Page<Course> getCoursesByTeacherId(Long teacherId, Pageable pageable);
 
-    @Query("SELECT c FROM Course c WHERE c.id IN :ids")
+    @Query("SELECT c.id FROM Course c WHERE c.id IN :ids")
     List<Course> findCoursesByIds(@Param("ids") List<Long> ids);
+
+    @Query("SELECT c FROM Course c WHERE " +
+            "(:categoryId IS NULL OR :categoryId = 0 OR c.category.id = :categoryId) " +
+            "AND (:keyword IS NULL OR :keyword = '' OR c.name LIKE %:keyword% OR c.description LIKE %:keyword%)")
+    Page<Course> searchCoursesRedis
+            (@Param("categoryId") Long categoryId,
+             @Param("keyword") String keyword, Pageable pageable);
 }

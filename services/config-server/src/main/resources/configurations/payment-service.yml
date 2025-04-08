@@ -19,3 +19,9 @@ spring:
 
 server:
   port: 8095
+
+application:
+  config:
+    user-url: http://localhost:8096/api/users
+    course-url: http://localhost:8096/api/courses
+    enrollment-url: http://localhost:8096/api/enrollments

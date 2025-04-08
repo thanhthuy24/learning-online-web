@@ -8,6 +8,7 @@ import com.htt.elearning.receipt.dto.ReceiptDTO;
 import com.htt.elearning.receipt.pojo.Cart;
 import com.htt.elearning.receipt.pojo.Receipt;
 import com.htt.elearning.receipt.repository.ReceiptRepository;
+import com.htt.elearning.receipt.response.ReceiptResponse;
 import com.htt.elearning.receiptdetail.pojo.Receiptdetail;
 import com.htt.elearning.receiptdetail.repository.ReceiptDetailRepository;
 import com.htt.elearning.user.UserClient;
@@ -90,7 +91,6 @@ public class ReceiptServiceImpl implements ReceiptService {
                 Long courseId = cart.getId();
                 Long count = 0L;
 
-//                Optional<Enrollment> enrollments = enrollmentRepository.findByUserIdAndCourseId(userId, courseId);
                 Boolean enrollment = enrollmentClient.checkEnrollment(userId, courseId);
                 if (!enrollment) {
                     count++;
@@ -136,5 +136,4 @@ public class ReceiptServiceImpl implements ReceiptService {
             }
 
         }
-
     }}

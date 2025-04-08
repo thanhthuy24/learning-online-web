@@ -16,13 +16,22 @@ spring:
     baseline-version: 0
     user: ${spring.datasource.username}
     password: ${spring.datasource.password}
+  kafka:
+    producer:
+      bootstrap-servers: localhost:9092
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        spring.json.type.mapping: lesson:com.htt.elearning.lesson.pojo.Lesson
+
+
 server:
   port: 8050
 
 application:
   config:
-    cloudinary-url: http://localhost:8080/api/cloudinary
-    user-url: http://localhost:8080/api/users
-    enrollment-url: http://localhost:8080/api/enrollments
-    progress-url: http://localhost:8080/api/progress
-    notification-url: http://localhost:8080/api/get-notification
+    cloudinary-url: http://localhost:8096/api/cloudinary
+    user-url: http://localhost:8096/api/users
+    enrollment-url: http://localhost:8096/api/enrollments
+    progress-url: http://localhost:8096/api/progress
+    notification-url: http://localhost:8096/api/get-notification

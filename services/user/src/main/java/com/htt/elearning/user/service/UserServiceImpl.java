@@ -361,4 +361,9 @@ public class UserServiceImpl implements UserService {
     public UserResponse getUserByUserIdClient(Long userId) {
         return userRepository.getUserById(userId);
     }
+
+    @Override
+    public List<Long> searchUserIdsByKeyword(String keyword) {
+        return userRepository.searchUserIdsByKeyword(keyword);
+    }
 }

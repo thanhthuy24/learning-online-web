@@ -145,7 +145,9 @@ public class WebSecurityConfig {
                             .requestMatchers(POST, "api/token").permitAll()
                             .requestMatchers(DELETE, "api/token/userId").permitAll()
 
-                            .requestMatchers(GET, "api/teachers/**").permitAll()
+                            .requestMatchers(GET, "api/teachers/all").permitAll()
+                            .requestMatchers(GET, "api/teachers/user/").permitAll()
+                            .requestMatchers(GET, "api/teachers/{teacherId}/get-teacherId").permitAll()
                             .requestMatchers(POST, "api/teachers/**").hasAnyRole(Role.ADMIN)
                             .requestMatchers(PUT, "api/teachers/**").hasAnyRole(Role.ADMIN, Role.TEACHER)
                             .requestMatchers(DELETE, "api/teachers/**").hasAnyRole(Role.ADMIN)

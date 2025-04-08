@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 @FeignClient(
         name = "user-service",
         contextId = "userServiceV2",  // Thêm contextId duy nhất
-        url = "http://localhost:8080/api/teachers"
+        url = "http://localhost:8090/api/teachers"
 )
 public interface TeacherClient {
     @GetMapping("/{teacherId}/get-teacherId")

@@ -1,6 +1,8 @@
 package com.htt.elearning.lesson.service;
 
 import com.htt.elearning.enrollment.EnrollmentClient;
+import com.htt.elearning.kafka.LessonCreateEvent;
+import com.htt.elearning.kafka.LessonProducer;
 import com.htt.elearning.lesson.response.LessonResponse;
 import com.htt.elearning.notification.NotificationClient;
 import com.htt.elearning.notification.dto.NotificationDTO;
@@ -45,6 +47,8 @@ public class LessonServiceImpl implements LessonService {
     private final ModelMapper modelMapper;
     private final NotificationClient notificationClient;
 
+    private final LessonProducer lessonProducer;
+
     @Override
     public Lesson createLesson(LessonDTO lessonDTO) {
         Course existCourse = courseRepository
@@ -60,17 +64,18 @@ public class LessonServiceImpl implements LessonService {
 
         List<UserResponse> users = enrollmentClient.getUsersByCourseIdClient(lessonDTO.getCourseId());
 
-        users.forEach(user -> {
-            NotificationDTO notificationDTO = NotificationDTO.builder()
-                    .title("Khoá học " + existCourse.getName() + " bạn đang ký vừa có bài học mới!")
-                    .message("Bài học mới: " + lessonDTO.getName() + ", hãy check ngay nào, " + user.getUsername() + " ơi!")
-                    .userId(user.getId())
-                    .build();
+        Lesson saveLesson = lessonRepository.save(newLesson);
 
-            notificationClient.createNotification(notificationDTO);
-        });
+        LessonCreateEvent event = LessonCreateEvent.builder()
+                .id(saveLesson.getId())
+                .name(saveLesson.getName())
+                .courseId(existCourse.getId())
+                .courseName(existCourse.getName())
+                .createdAt(new Date())
+                .build();
 
-        return lessonRepository.save(newLesson);
+        lessonProducer.sendLessonCreateEvent(event);
+        return newLesson;
     }
 
     @Override

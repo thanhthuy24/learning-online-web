@@ -31,7 +31,7 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     public void sendNotificationToEnrolledUsers(Long courseId, String title, String body) throws Exception {
-        List<Long> enrolledUserIds = enrollmentClient.getUsersByCourseIdClient(courseId);
+        List<Long> enrolledUserIds = enrollmentClient.getUserIdsByCourseIdClient(courseId);
         List<TokenResponse> tokens = tokenClient.getListTokens(enrolledUserIds);
 
         for (TokenResponse fcmToken : tokens) {

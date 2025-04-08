@@ -1,0 +1,23 @@
+server:
+  port: 8096
+spring:
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true # Tự động ánh xạ route dựa trên tên service đã đăng ký
+#      routes:
+#        - id: assignment-service
+#          uri: lb://ASSIGNMENT-SERVICE
+#          predicates:
+#            - Path=/api/assignments/**
+#        - id: user-service
+#          uri: lb://USER-SERVICE
+#          predicates:
+#            - Path=/api/users/**
+#        - id: courses-service
+#          uri: lb://COURSES-SERVICE
+#          predicates:
+#            - Path=/api/courses/**
+
+

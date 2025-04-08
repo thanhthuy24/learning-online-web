@@ -103,6 +103,14 @@ public class ApiEnrollmentController {
         return enrollmentService.getUsersByCourseIdClient(courseId);
     }
 
+    @GetMapping("/get-userIds/{courseId}")
+    @ResponseStatus(HttpStatus.OK)
+    public List<Long> getUserIdsByCourseIdClient(
+            @PathVariable Long courseId
+    ){
+        return enrollmentService.getEnrolledUserIds(courseId);
+    }
+
     @PostMapping("/create-enroll")
     @ResponseStatus(HttpStatus.CREATED)
     public EnrollmentResponse createEnrollmentClient(

@@ -48,7 +48,7 @@ public class TeacherServiceImpl implements TeacherService {
     public TeacherResponse getTeacherByIdClient(Long id) {
         Teacher teacher = teacherRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Can not find teacher by id: " + id));
-        return modelMapper.map(teacher, TeacherResponse.class);
+        return TeacherResponse.fromTeacher(teacher);
     }
 
     @Override
