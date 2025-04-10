@@ -17,7 +17,8 @@ import java.util.Date;
 @NoArgsConstructor
 public class Replycomment {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "replycomment_seq")
+    @SequenceGenerator(name = "replycomment_seq", sequenceName = "replycomment_id_seq", allocationSize = 1)
     @Column(name = "id", nullable = false)
     private Long id;
 

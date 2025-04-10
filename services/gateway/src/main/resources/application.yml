@@ -8,3 +8,11 @@ logging:
   level:
     org.springframework.cloud.gateway: TRACE
     org.springframework.web: DEBUG
+
+secure:
+  open-paths:
+    - /api/teachers/all
+    - /api/teachers/users/
+    - /api/teachers/get-teacher-by-userId/**
+    - /api/users/login
+    - /api/users/register

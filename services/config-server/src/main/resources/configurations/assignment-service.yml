@@ -22,7 +22,7 @@ spring:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
       properties:
-        spring.json.type.mapping: assignment:com.htt.elearning.lesson.pojo.Assignment
+        spring.json.type.mapping: assignment:com.htt.elearning.assignment.pojo.Assignment
 
 server:
   port: 8070
@@ -34,3 +34,4 @@ application:
     tag-url: http://localhost:8096/api/tags
     enrollment-url: http://localhost:8096/api/enrollments
     lesson-url: http://localhost:8096/api/lessons
+    notification-url: http://localhost:8096/api/get-notification

@@ -14,7 +14,8 @@ import lombok.*;
 @AllArgsConstructor
 public class Register {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "register_seq")
+    @SequenceGenerator(name = "register_seq", sequenceName = "register_id_seq", allocationSize = 1)
     @Column(name = "id", nullable = false)
     private Long id;
 

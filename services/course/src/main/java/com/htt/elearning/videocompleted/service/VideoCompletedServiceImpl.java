@@ -10,6 +10,7 @@ import com.htt.elearning.video.repository.VideoRepository;
 import com.htt.elearning.videocompleted.dto.VideoCompletedDTO;
 import com.htt.elearning.videocompleted.pojo.Videocompleted;
 import com.htt.elearning.videocompleted.repository.VideoCompletedRepository;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -26,13 +27,14 @@ public class VideoCompletedServiceImpl implements VideoCompletedService {
     private final UserClient userClient;
     private final EnrollmentClient enrollmentClient;
     private final ProgressClient progressClient;
+    private final HttpServletRequest request;
 
     @Override
     public Videocompleted createVideocompleted(VideoCompletedDTO videoCompleteDTO) throws DataNotFoundException {
         Video existingVideo = videoRepository.findById(videoCompleteDTO.getVideoId())
                 .orElseThrow(() -> new DataNotFoundException("Video not found!"));
-
-        Long userId = userClient.getUserIdByUsername();
+        String token = request.getHeader("Authorization");
+        Long userId = userClient.getUserIdByUsernameClient(token);
 
         Videocompleted checkVideoCompleted = videoCompletedRepository.findByVideoIdAndUserId(videoCompleteDTO.getVideoId(), userId);
         if (checkVideoCompleted != null) {
@@ -60,7 +62,8 @@ public class VideoCompletedServiceImpl implements VideoCompletedService {
 
     @Override
     public List<Videocompleted> getVideoCompletedBy(Long userId) {
-        Long userID = userClient.getUserIdByUsername();
+        String token = request.getHeader("Authorization");
+        Long userID = userClient.getUserIdByUsernameClient(token);
 
         if (userID == userId){
             List<Videocompleted> listVideosCompleted = videoCompletedRepository.findByUserId(userID);
@@ -74,7 +77,8 @@ public class VideoCompletedServiceImpl implements VideoCompletedService {
 
     @Override
     public Long countVideoCompletedBy(Long lessonId) throws DataNotFoundException {
-        Long userId = userClient.getUserIdByUsername();
+        String token = request.getHeader("Authorization");
+        Long userId = userClient.getUserIdByUsernameClient(token);
         Long count = videoCompletedRepository.countWatchedVideosByUserAndLessonId(userId, lessonId);
         if (count == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Video not found!");

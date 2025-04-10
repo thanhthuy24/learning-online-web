@@ -83,13 +83,13 @@ public class ApiAssignmentController {
                     .toList();
             return ResponseEntity.badRequest().body(errorMessages);
         }
-        Assignment asignment = assignmentService.createAssignment(assignmentDTO);
+        Assignment assignment = assignmentService.createAssignment(assignmentDTO);
 //        notificationService.sendNotificationToEnrolledUsers(
 //                assignmentDTO.getCourseId(),
 //                "Bài tập mới!",
 //                "Khóa học của bạn có bài tập mới vừa được tạo: " + assignmentDTO.getName()
 //        );
-        return ResponseEntity.ok(asignment);
+        return ResponseEntity.ok(assignment);
     }
 
     @PutMapping("/{assignmentId}")

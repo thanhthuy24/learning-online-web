@@ -15,11 +15,14 @@ import static org.springframework.kafka.support.KafkaHeaders.TOPIC;
 public class AssignmentProducer {
     private final KafkaTemplate<String, AssignmentCreateEvent> kafkaTemplate;
 
-    public void sendLessonCreateEvent(AssignmentCreateEvent assignmentCreateEvent) {
+    public void sendAssignmentCreateEvent(AssignmentCreateEvent assignmentCreateEvent, String token) {
         log.info("Sending create new assignment successfully");
+
+        // Tạo message và thêm header "Authorization"
         Message<AssignmentCreateEvent> message = MessageBuilder
                 .withPayload(assignmentCreateEvent)
-                .setHeader(TOPIC, "assignments-topic")
+                .setHeader("Authorization", token)  // Thêm header Authorization
+                .setHeader(TOPIC, "assignment-topic")
                 .build();
 
         kafkaTemplate.send(message);

@@ -87,8 +87,8 @@ public class EssayController {
                     .toList();
             return ResponseEntity.badRequest().body(errorMessages);
         }
-
-        return ResponseEntity.ok(essayService.createEssay(essayDTO));
+        Essay essay = essayService.createEssay(essayDTO);
+        return ResponseEntity.ok(essay);
     }
 
     @PutMapping("/{essayId}")

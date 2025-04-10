@@ -9,7 +9,7 @@ spring:
         registration:
           google:
             client-id: #client-id
-            client-secret: #client-secret
+            client-secret:  #client-secret
             redirect-uri: ${GOOGLE_REDIRECT_URI:http://localhost:8082/auth/google/callback}
         provider:
           google:
@@ -24,6 +24,6 @@ spring:
 
 jwt:
   expiration: 2592000
-  secretKey: #secretKey
+  secretKey: CmAl9817K7+5oGiE8aq53pL9w0JPaoMHLFBeFfE1xfk= #secretKey
 
 

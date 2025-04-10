@@ -12,6 +12,7 @@ import com.htt.elearning.course.pojo.Course;
 import com.htt.elearning.course.repository.CourseRepository;
 import com.htt.elearning.tag.pojo.Tag;
 import com.htt.elearning.tag.repository.TagRepository;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.*;
@@ -33,6 +34,8 @@ public class CourseServiceImpl implements CourseService {
     private final TeacherClient teacherClient;
     private final UserClient userClient;
     private final ModelMapper modelMapper;
+    private final HttpServletRequest request;
+
 
     @Override
     public Course createCourse(CourseDTO courseDTO) {
@@ -45,8 +48,8 @@ public class CourseServiceImpl implements CourseService {
                 .findById(courseDTO.getTagId())
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND, "Can not find tag by id: " + courseDTO.getTagId()));
-
-        TeacherResponse existingTeacher = Optional.ofNullable(teacherClient.getTeacherById(courseDTO.getTeacherId()))
+        String token = request.getHeader("Authorization");
+        TeacherResponse existingTeacher = Optional.ofNullable(teacherClient.getTeacherById(courseDTO.getTeacherId(), token))
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "Can not find teacher with id: " + courseDTO.getCategoryId()));
 
@@ -124,10 +127,11 @@ public class CourseServiceImpl implements CourseService {
 //        String username = SecurityContextHolder.getContext().getAuthentication().getName();
 //        String username = userClient.getUsername();
 //        Long userId = userRepository.getUserByUsername(username).getId();
-        Long userId = userClient.getUserIdByUsername();
+        String token = request.getHeader("Authorization");
+        Long userId = userClient.getUserIdByUsernameClient(token);
 
 
-        TeacherResponse existingTeacher = Optional.ofNullable(teacherClient.getTeacherById(teacherId))
+        TeacherResponse existingTeacher = Optional.ofNullable(teacherClient.getTeacherById(teacherId, token))
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "Can not find teacher with id: " + teacherId));
 
@@ -148,8 +152,8 @@ public class CourseServiceImpl implements CourseService {
             Category existCategory = categoryRepository.findById(courseDTO.getCategoryId())
                     .orElseThrow(() -> new ResponseStatusException(
                             HttpStatus.NOT_FOUND, "Can not find category by id: " + courseDTO.getCategoryId()));
-
-            TeacherResponse existingTeacher = Optional.ofNullable(teacherClient.getTeacherById(courseDTO.getTeacherId()))
+            String token = request.getHeader("Authorization");
+            TeacherResponse existingTeacher = Optional.ofNullable(teacherClient.getTeacherById(courseDTO.getTeacherId(), token))
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                             "Can not find teacher with id: " + courseDTO.getCategoryId()));
 

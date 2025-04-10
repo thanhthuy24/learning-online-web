@@ -18,7 +18,8 @@ import java.util.Set;
 @NoArgsConstructor
 public class Tag {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "tag_seq")
+    @SequenceGenerator(name = "tag_seq", sequenceName = "tag_id_seq", allocationSize = 1)
     @Column(name = "id", nullable = false)
     private Long id;
 

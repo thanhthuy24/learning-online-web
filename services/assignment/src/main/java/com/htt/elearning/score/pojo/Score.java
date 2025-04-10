@@ -16,7 +16,8 @@ import org.hibernate.annotations.OnDeleteAction;
 @NoArgsConstructor
 public class Score {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "score_seq")
+    @SequenceGenerator(name = "score_seq", sequenceName = "score_id_seq", allocationSize = 1)
     @Column(name = "id", nullable = false)
     private Long id;
 

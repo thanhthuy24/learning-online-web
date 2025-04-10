@@ -22,6 +22,7 @@ import com.htt.elearning.user.response.UserResponse;
 import com.htt.elearning.video.dtos.VideoDTO;
 import com.htt.elearning.video.pojo.Video;
 import com.htt.elearning.video.repository.VideoRepository;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.*;
@@ -46,11 +47,13 @@ public class LessonServiceImpl implements LessonService {
     private final TeacherClient teacherClient;
     private final ModelMapper modelMapper;
     private final NotificationClient notificationClient;
+    private final HttpServletRequest request;
 
     private final LessonProducer lessonProducer;
 
     @Override
     public Lesson createLesson(LessonDTO lessonDTO) {
+        String token = request.getHeader("Authorization");
         Course existCourse = courseRepository
                 .findById(lessonDTO.getCourseId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
@@ -62,7 +65,7 @@ public class LessonServiceImpl implements LessonService {
                 .course(existCourse)
                 .build();
 
-        List<UserResponse> users = enrollmentClient.getUsersByCourseIdClient(lessonDTO.getCourseId());
+        List<UserResponse> users = enrollmentClient.getUsersByCourseIdClient(lessonDTO.getCourseId(), token);
 
         Lesson saveLesson = lessonRepository.save(newLesson);
 
@@ -74,7 +77,7 @@ public class LessonServiceImpl implements LessonService {
                 .createdAt(new Date())
                 .build();
 
-        lessonProducer.sendLessonCreateEvent(event);
+        lessonProducer.sendLessonCreateEvent(event, token);
         return newLesson;
     }
 
@@ -148,9 +151,9 @@ public class LessonServiceImpl implements LessonService {
 
     @Override
     public List<LessonVideoDTO> getLessonByCourseId(Long courseId) {
-
-        Long userId = userClient.getUserIdByUsername();
-        Long role = userClient.getRoleIdClient();
+        String token = request.getHeader("Authorization");
+        Long userId = userClient.getUserIdByUsernameClient(token);
+        Long role = userClient.getRoleIdClient(token);
         if(role == 1) {
             Boolean check = enrollmentClient.checkEnrollment(userId, courseId);
             if (check == null || !check) {
@@ -161,7 +164,7 @@ public class LessonServiceImpl implements LessonService {
         }
         Course course = courseRepository.getCourseById(courseId);
         Long ownerCourseId = course.getTeacherId();
-        TeacherResponse teacher = teacherClient.getTeacherById(userId);
+        TeacherResponse teacher = teacherClient.getTeacherByUserIdClient(userId, token);
 
         if(role == 3) {
             Long teacherId = teacher.getId();
@@ -171,7 +174,7 @@ public class LessonServiceImpl implements LessonService {
                 );
             }
         }
-//
+
         List<Lesson> lessons = lessonRepository.findByCourseId(courseId);
         return lessons.stream().map(this::convertToDTO).collect(Collectors.toList());
     }

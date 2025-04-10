@@ -17,7 +17,8 @@ import org.hibernate.annotations.OnDeleteAction;
 @NoArgsConstructor
 public class Choice {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "choice_seq")
+    @SequenceGenerator(name = "choice_seq", sequenceName = "choice_id_seq", allocationSize = 1)
     @Column(name = "id", nullable = false)
     private Long id;
 

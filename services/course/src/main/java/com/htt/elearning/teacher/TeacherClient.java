@@ -4,6 +4,7 @@ import com.htt.elearning.teacher.response.TeacherResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestHeader;
 
 @FeignClient(
         name = "user-service",
@@ -12,5 +13,14 @@ import org.springframework.web.bind.annotation.PathVariable;
 )
 public interface TeacherClient {
     @GetMapping("/{teacherId}/get-teacherId")
-    TeacherResponse getTeacherById(@PathVariable("teacherId") Long teacherId);
+    TeacherResponse getTeacherById(
+            @PathVariable("teacherId") Long teacherId,
+            @RequestHeader("Authorization") String token
+    );
+
+    @GetMapping("/get-teacher-by-userId/{userId}")
+    TeacherResponse getTeacherByUserIdClient(
+            @PathVariable("userId") Long userId,
+            @RequestHeader("Authorization") String token
+    );
 }

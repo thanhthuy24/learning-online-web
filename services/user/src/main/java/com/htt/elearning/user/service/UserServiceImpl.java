@@ -198,8 +198,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponse getUserByUsernameClient(String username) {
-        UserResponse user = userRepository.getUserByUsername(username);
-        return user;
+        Optional<User> user = userRepository.findByUsername(username);
+        return modelMapper.map(user, UserResponse.class);
     }
 
     @Override
@@ -301,7 +301,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public Long getUserIdByUsername() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        Long userId = userRepository.getUserByUsername(username).getId();
+        Optional<User> user = userRepository.findByUsername(username);
+        Long userId = user.get().getId();
         return userId;
     }
 
@@ -359,7 +360,8 @@ public class UserServiceImpl implements UserService {
 //    user - client
     @Override
     public UserResponse getUserByUserIdClient(Long userId) {
-        return userRepository.getUserById(userId);
+        Optional<User> user = userRepository.findById(userId);
+        return modelMapper.map(user, UserResponse.class);
     }
 
     @Override

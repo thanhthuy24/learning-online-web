@@ -20,7 +20,8 @@ import java.util.Date;
 @NoArgsConstructor
 public class Answerchoice {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "answerchoice_seq")
+    @SequenceGenerator(name = "answerchoice_seq", sequenceName = "answerchoice_id_seq", allocationSize = 1)
     @Column(name = "id", nullable = false)
     private Long id;
 

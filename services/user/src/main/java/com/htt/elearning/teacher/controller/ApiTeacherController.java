@@ -109,4 +109,13 @@ public class ApiTeacherController {
     ){
         return teacherService.getTeacherByIdClient(teacherId);
     }
+
+    @GetMapping("/get-teacher-by-userId/{userId}")
+    @ResponseStatus(HttpStatus.OK)
+    public TeacherResponse getTeacherByUserIdClient(
+            @PathVariable("userId") Long userId
+
+    ){
+        return teacherService.getTeacherByUserIdClient(userId);
+    }
 }

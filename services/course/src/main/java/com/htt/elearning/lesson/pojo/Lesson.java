@@ -22,7 +22,8 @@ import java.util.List;
 @NoArgsConstructor
 public class Lesson {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "lesson_seq")
+    @SequenceGenerator(name = "lesson_seq", sequenceName = "lesson_id_seq", allocationSize = 1)
     @Column(name = "id", nullable = false)
     private Long id;
 

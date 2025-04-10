@@ -17,9 +17,10 @@ public class AssignmentDoneController {
 
     @GetMapping("/assignment/{assignmentId}")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<?> getAssignmentDone(
+    public ResponseEntity<Userassignmentdone> getAssignmentDone(
             @PathVariable Long assignmentId) {
-        return ResponseEntity.ok(assignmentDoneService.getAssignmentDone(assignmentId));
+        Userassignmentdone userassignmentdone = assignmentDoneService.getAssignmentDone(assignmentId);
+        return ResponseEntity.ok(userassignmentdone);
     }
 
     @PostMapping("")

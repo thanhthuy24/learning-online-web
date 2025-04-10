@@ -43,14 +43,14 @@ public class NotificationController {
                 .build());
     }
 
-    @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public NotificationResponse createNotification(
-            @RequestBody NotificationDTO notificationDTO
-    ) {
-        NotificationResponse notification = notificationService.createNotification(notificationDTO);
-        return notification;
-    }
+//    @PostMapping
+//    @ResponseStatus(HttpStatus.CREATED)
+//    public NotificationResponse createNotification(
+//            @RequestBody NotificationDTO notificationDTO
+//    ) {
+//        NotificationResponse notification = notificationService.createNotification(notificationDTO);
+//        return notification;
+//    }
 
     @PatchMapping("/mark-read/{notificationId}")
     @ResponseStatus(HttpStatus.CREATED)

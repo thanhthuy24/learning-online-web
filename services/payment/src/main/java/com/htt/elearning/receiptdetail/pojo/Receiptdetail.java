@@ -13,7 +13,8 @@ import lombok.*;
 @AllArgsConstructor
 public class Receiptdetail {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "receiptdetail_seq")
+    @SequenceGenerator(name = "receiptdetail_seq", sequenceName = "receiptdetail_id_seq", allocationSize = 1)
     @Column(name = "id", nullable = false)
     private Long id;
 

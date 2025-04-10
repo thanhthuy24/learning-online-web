@@ -17,7 +17,8 @@ import java.util.Date;
 @Builder
 public class Courserating {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "courserating_seq")
+    @SequenceGenerator(name = "courserating_seq", sequenceName = "courserating_id_seq", allocationSize = 1)
     @Column(name = "id", nullable = false)
     private Long id;
 

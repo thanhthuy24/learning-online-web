@@ -17,7 +17,8 @@ import java.util.Set;
 @AllArgsConstructor
 public class Receipt {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "receipt_seq")
+    @SequenceGenerator(name = "receipt_seq", sequenceName = "receipt_id_seq", allocationSize = 1)
     @Column(name = "id", nullable = false)
     private Long id;
 

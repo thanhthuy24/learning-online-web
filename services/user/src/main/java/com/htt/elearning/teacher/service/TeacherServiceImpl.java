@@ -95,4 +95,13 @@ public class TeacherServiceImpl implements TeacherService {
     public List<Teacher> getAll() {
         return teacherRepository.findAll();
     }
+
+    @Override
+    public TeacherResponse getTeacherByUserIdClient(Long userId) {
+        Teacher teacher = teacherRepository.findByUserId(userId);
+        if (teacher == null) {
+            return null;
+        }
+        return TeacherResponse.fromTeacher(teacher);
+    }
 }

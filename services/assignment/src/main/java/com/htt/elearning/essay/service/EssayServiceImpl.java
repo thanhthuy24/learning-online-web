@@ -1,6 +1,7 @@
 package com.htt.elearning.essay.service;
 import com.htt.elearning.assignment.pojo.Assignment;
 import com.htt.elearning.assignment.repository.AssignmentRepository;
+import com.htt.elearning.enrollment.EnrollmentClient;
 import com.htt.elearning.essay.dto.EssayDTO;
 import com.htt.elearning.essay.pojo.Essay;
 import com.htt.elearning.essay.repository.EssayRepository;
@@ -8,6 +9,7 @@ import com.htt.elearning.exceptions.DataNotFoundException;
 import com.htt.elearning.question.pojo.Question;
 import com.htt.elearning.question.repository.QuestionRepository;
 import com.htt.elearning.user.UserClient;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -24,23 +26,31 @@ public class EssayServiceImpl implements EssayService {
     private final AssignmentRepository assignmentRepository;
     private final QuestionRepository questionRepository;
     private final UserClient userClient;
+    private final HttpServletRequest request;
+    private final EnrollmentClient enrollmentClient;
 
     @Override
     public Essay createEssay(EssayDTO essayDTO) throws DataNotFoundException {
         Assignment existingAssignment = assignmentRepository.findById(essayDTO.getAssignmentId())
                 .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "Can not find assignment by id "+essayDTO.getAssignmentId() ));
+                        HttpStatus.NOT_FOUND, "Can not find assignment by id "+ essayDTO.getAssignmentId() ));
 
         Question existingQuestion = questionRepository.findById(essayDTO.getQuestionId())
                 .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "Can not find question by id "+essayDTO.getQuestionId() ));
+                        HttpStatus.NOT_FOUND, "Can not find question by id "+ essayDTO.getQuestionId() ));
 
-        Essay checkEssay = essayRepository.findByQuestionId(essayDTO.getQuestionId());
+        String token = request.getHeader("Authorization");
+        Long userId = userClient.getUserIdByUsernameClient(token);
+
+        Essay checkEssay = essayRepository.findByQuestionIdAndUserId(essayDTO.getQuestionId(), userId);
         if (checkEssay != null) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Essay already exists");
         }
 
-        Long userId = userClient.getUserIdByUsername();
+        Boolean checkEnroll = enrollmentClient.checkEnrollment(userId, existingAssignment.getCourseId(), token);
+        if (!checkEnroll) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You must enroll the course first!!");
+        }
 
         Essay newEssay = Essay.builder()
                 .content(essayDTO.getContent())
@@ -66,7 +76,8 @@ public class EssayServiceImpl implements EssayService {
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND, "Can not find question by id "+essayDTO.getQuestionId() ));
 
-        Long userId = userClient.getUserIdByUsername();
+        String token = request.getHeader("Authorization");
+        Long userId = userClient.getUserIdByUsernameClient(token);
 
         if(existingEssay != null){
             existingEssay.setContent(essayDTO.getContent());

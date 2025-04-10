@@ -1,5 +1,6 @@
 package com.htt.elearning.lesson.controller;
 
+import com.htt.elearning.cloudinary.CloudinaryClient;
 import com.htt.elearning.lesson.dtos.LessonDTO;
 import com.htt.elearning.lesson.dtos.LessonVideoDTO;
 import com.htt.elearning.lesson.pojo.Lesson;
@@ -22,13 +23,14 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("api/lessons")
 @RequiredArgsConstructor
 public class ApiLessonController {
     private final LessonService lessonService;
-//    private final CloudinaryService cloudinaryService;
+    private final CloudinaryClient cloudinaryClient;
     private final VideoService videoService;
 //    private final NotificationService notificationService;
 
@@ -78,13 +80,6 @@ public class ApiLessonController {
             }
 
             Lesson newLesson = lessonService.createLesson(lessonDTO);
-
-//            notificationService.sendNotificationToEnrolledUsers(
-//                    lessonDTO.getCourseId(),
-//                    "Bài học mới!",
-//                    "Khóa học của bạn có bài học mới: " + lessonDTO.getName()
-//            );
-
             return ResponseEntity.ok(newLesson);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -137,9 +132,8 @@ public class ApiLessonController {
 
     private String storeFile(MultipartFile file) /*throws IOException*/ {
         // tai file len cloudinary va lay URl
-//        Map<String, Object> uploadResult = cloudinaryService.uploadFile(file);
-//        return uploadResult.get("url").toString();
-        return null;
+        Map<String, Object> uploadResult = cloudinaryClient.uploadFileImage(file);
+        return uploadResult.get("url").toString();
     }
 
     @PutMapping("/{lessonId}")

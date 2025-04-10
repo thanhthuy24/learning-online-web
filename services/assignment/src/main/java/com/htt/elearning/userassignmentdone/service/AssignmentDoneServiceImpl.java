@@ -6,6 +6,7 @@ import com.htt.elearning.user.UserClient;
 import com.htt.elearning.userassignmentdone.dto.AssignmentDoneDTO;
 import com.htt.elearning.userassignmentdone.pojo.Userassignmentdone;
 import com.htt.elearning.userassignmentdone.repository.AssignmentDoneRepository;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,7 @@ public class AssignmentDoneServiceImpl implements AssignmentDoneService {
     private final UserClient userClient;
     private final AssignmentRepository assignmentRepository;
     private final EnrollmentClient enrollmentClient;
+    private final HttpServletRequest request;
 
     @Override
     public Userassignmentdone createAssignmentDone(AssignmentDoneDTO assignmentDoneDTO){
@@ -30,8 +32,9 @@ public class AssignmentDoneServiceImpl implements AssignmentDoneService {
                         HttpStatus.NOT_FOUND, "Can not find Assignment with id "
                         + assignmentDoneDTO.getAssignmentId()));
 
-        Long userId = userClient.getUserIdByUsername();
-        Boolean checkEnrollment = enrollmentClient.checkEnrollment(userId, existingAssignment.getCourseId());
+        String token = request.getHeader("Authorization");
+        Long userId = userClient.getUserIdByUsernameClient(token);
+        Boolean checkEnrollment = enrollmentClient.checkEnrollment(userId, existingAssignment.getCourseId(), token);
         if (checkEnrollment == null || !checkEnrollment) {
             new ResponseStatusException(HttpStatus.NOT_FOUND,
                     "This course isn't enrolled in your list! Please enroll before participating in this course!!");
@@ -53,7 +56,8 @@ public class AssignmentDoneServiceImpl implements AssignmentDoneService {
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND, "Can not find Assignment with id "
                         + assignmentId));
-        Long userId = userClient.getUserIdByUsername();
+        String token = request.getHeader("Authorization");
+        Long userId = userClient.getUserIdByUsernameClient(token);
 
         Userassignmentdone assignmentDone = assignmentDoneRepository.findByUserIdAndAssignmentId(userId, assignmentId);
         if (assignmentDone == null) {

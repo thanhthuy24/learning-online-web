@@ -11,4 +11,5 @@ import java.util.Optional;
 public interface EssayRepository extends JpaRepository<Essay, Long> {
     Page<Essay> findByAssignmentId(Long assignmentId, PageRequest pageRequest);
     Essay findByQuestionId(Long questionId);
+    Essay findByQuestionIdAndUserId(Long questionId, Long userId);
 }

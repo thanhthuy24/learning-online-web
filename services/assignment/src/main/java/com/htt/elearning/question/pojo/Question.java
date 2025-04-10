@@ -23,7 +23,8 @@ import java.util.Set;
 @NoArgsConstructor
 public class Question {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "question_seq")
+    @SequenceGenerator(name = "question_seq", sequenceName = "question_id_seq", allocationSize = 1)
     @Column(name = "id", nullable = false)
     private Long id;
 

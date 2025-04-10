@@ -8,6 +8,7 @@ import com.htt.elearning.enrollment.repository.EnrollmentRepository;
 import com.htt.elearning.progress.service.ProgressService;
 import com.htt.elearning.user.UserClient;
 import com.htt.elearning.user.response.UserResponse;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,7 @@ public class EnrollmentServiceImpl implements EnrollmentService {
     private final CourseClient courseClient;
     private final UserClient userClient;
     private final ProgressService progressService;
+    private final HttpServletRequest request;
 
     @Override
     public Boolean checkEnrolled(Long userId, Long courseId) {
@@ -124,10 +126,11 @@ public class EnrollmentServiceImpl implements EnrollmentService {
 //    enrollment - client
     @Override
     public List<UserResponse> getUsersByCourseIdClient(Long courseId) {
+        String token = request.getHeader("Authorization");
         List<Long> list = enrollmentRepository.findUsersByCourseId(courseId);
         List<UserResponse> userResponseList = new ArrayList<>();
         for (Long userId : list) {
-            UserResponse u = userClient.getUserByIdClient(userId);
+            UserResponse u = userClient.getUserByIdClient(userId, token);
             userResponseList.add(u);
         }
         return userResponseList;

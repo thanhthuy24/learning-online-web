@@ -9,7 +9,7 @@ public interface NotificationService {
     void sendNotificationToEnrolledUsers(Long courseId, String title, String body) throws Exception;
 
     Page<Notification> findNotificationsByUserId(Pageable pageable);
-    NotificationResponse createNotification(NotificationDTO notificationDTO);
+    NotificationResponse createNotification(NotificationDTO notificationDTO, String token);
     //    Notification createNotification(String title, String message, Long userId);
     Notification updateNotification(Long notificationId);
 }

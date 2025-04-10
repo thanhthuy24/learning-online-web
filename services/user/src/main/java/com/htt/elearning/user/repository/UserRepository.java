@@ -34,6 +34,7 @@ public interface UserRepository extends JpaRepository<User, Long>{
     Optional<User> findByGoogleAccount(String googleId);
 
 //    User - client
+    Optional<User> findById(Long id);
     UserResponse getUserById(Long id);
 
     @Query("SELECT r.id FROM User r WHERE " +

@@ -12,6 +12,7 @@ import com.htt.elearning.exceptions.DataNotFoundException;
 import com.htt.elearning.question.pojo.Question;
 import com.htt.elearning.question.repository.QuestionRepository;
 import com.htt.elearning.user.UserClient;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -34,6 +35,7 @@ public class AnswerChoiceServiceImpl implements AnswerChoiceService {
     private final UserClient userClient;
     private final ChoiceRepository choiceRepository;
     private final EnrollmentClient enrollmentClient;
+    private final HttpServletRequest request;
 
     @Override
     public Answerchoice createAnswerChoice(AnswerChoiceDTO answerChoiceDTO, Long assignmentId) throws DataNotFoundException {
@@ -61,9 +63,10 @@ public class AnswerChoiceServiceImpl implements AnswerChoiceService {
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND, "Can not find question with id " + answerChoiceDTO.getChoiceId()));
 
-        Long userId = userClient.getUserIdByUsername();
+        String token = request.getHeader("Authorization");
+        Long userId = userClient.getUserIdByUsernameClient(token);
 
-        Boolean checkEnrollment = enrollmentClient.checkEnrollment(userId, existingAssignment.getCourseId());
+        Boolean checkEnrollment = enrollmentClient.checkEnrollment(userId, existingAssignment.getCourseId(), token);
         if (checkEnrollment == null || !checkEnrollment) {
             new ResponseStatusException(HttpStatus.NOT_FOUND,
                     "This course isn't enrolled in your list! Please enroll before participating in this course!!");
@@ -98,9 +101,10 @@ public class AnswerChoiceServiceImpl implements AnswerChoiceService {
         List<Question> existingQuestions = questionRepository.findByAssignmentId(assignmentId);
         List<Choice> existingChoice = choiceRepository.findByQuestionIn(existingQuestions);
 
-        Long userId = userClient.getUserIdByUsername();
+        String token = request.getHeader("Authorization");
+        Long userId = userClient.getUserIdByUsernameClient(token);
 
-        Boolean checkEnrollment = enrollmentClient.checkEnrollment(userId, existingAssignment.getCourseId());
+        Boolean checkEnrollment = enrollmentClient.checkEnrollment(userId, existingAssignment.getCourseId(), token);
         if (checkEnrollment == null || !checkEnrollment) {
             new ResponseStatusException(HttpStatus.NOT_FOUND,
                     "This course isn't enrolled in your list! Please enroll before participating in this course!!");

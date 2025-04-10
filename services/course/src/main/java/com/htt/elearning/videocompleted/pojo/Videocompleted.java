@@ -16,7 +16,8 @@ import java.util.Date;
 @NoArgsConstructor
 public class Videocompleted {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "videocompleted_seq")
+    @SequenceGenerator(name = "videocompleted_seq", sequenceName = "videocompleted_id_seq", allocationSize = 1)
     @Column(name = "id", nullable = false)
     private Long id;
 

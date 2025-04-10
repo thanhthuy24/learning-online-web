@@ -18,7 +18,8 @@ import org.hibernate.annotations.OnDeleteAction;
 public class Video {
     public static final int MAXIMUM_VIDEOS_PER_LESSON = 5;
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "video_seq")
+    @SequenceGenerator(name = "video_seq", sequenceName = "video_id_seq", allocationSize = 1)
     @Column(name = "id", nullable = false)
     private Long id;
 

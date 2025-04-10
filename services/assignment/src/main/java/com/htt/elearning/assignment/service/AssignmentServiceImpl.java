@@ -16,6 +16,7 @@ import com.htt.elearning.tag.TagClient;
 import com.htt.elearning.tag.response.TagResponse;
 import com.htt.elearning.user.UserClient;
 import com.htt.elearning.user.response.UserResponse;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
 import org.springframework.http.HttpStatus;
@@ -35,6 +36,7 @@ public class AssignmentServiceImpl implements AssignmentService {
     private final UserClient userClient;
     private final EnrollmentClient enrollmentClient;
     private final AssignmentProducer assignmentProducer;
+    private final HttpServletRequest request;
 
     @Override
     public Page<AssignmentResponse> getAllAssignment(PageRequest pageRequest) {
@@ -75,18 +77,20 @@ public class AssignmentServiceImpl implements AssignmentService {
                 .dueDate(assignmentDTO.getDueDate())
                 .build();
 
-        List<UserResponse> users = enrollmentClient.getUsersByCourseIdClient(assignmentDTO.getCourseId());
+        String token = request.getHeader("Authorization");
+
+        List<UserResponse> users = enrollmentClient.getUsersByCourseIdClient(assignmentDTO.getCourseId(), token);
 
         Assignment saveAssignment = assignmentRepository.save(newAssignment);
 
-        assignmentProducer.sendLessonCreateEvent(
+        assignmentProducer.sendAssignmentCreateEvent(
                 AssignmentCreateEvent.builder()
                         .id(saveAssignment.getId())
                         .name(saveAssignment.getName())
                         .courseId(saveAssignment.getCourseId())
                         .courseName(existCourse.getName())
                         .createdAt(new Date())
-                .build());
+                .build(), token);
 
         return newAssignment;
     }
@@ -98,9 +102,10 @@ public class AssignmentServiceImpl implements AssignmentService {
 
     @Override
     public List<Assignment> getAssignmentByCourseId(Long courseId) {
-        Long userId = userClient.getUserIdByUsername();
+        String token = request.getHeader("Authorization");
+        Long userId = userClient.getUserIdByUsernameClient(token);
 
-        Boolean checkEnrollment = enrollmentClient.checkEnrollment(userId, courseId);
+        Boolean checkEnrollment = enrollmentClient.checkEnrollment(userId, courseId, token);
         if (checkEnrollment == null || !checkEnrollment) {
             new ResponseStatusException(HttpStatus.NOT_FOUND,
                     "This course isn't enrolled in your list! Please enroll before participating in this course!!");

@@ -35,8 +35,6 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: Admin123@
       MYSQL_DATABASE: elearningdb
-      MYSQL_USER: root
-      MYSQL_PASSWORD: Admin123@
     volumes:
       - mysql_data:/var/lib/mysql
     ports:

@@ -19,4 +19,5 @@ public interface TeacherService {
 
 //    techer-client
     TeacherResponse getTeacherByIdClient(Long id);
+    TeacherResponse getTeacherByUserIdClient(Long userId);
 }

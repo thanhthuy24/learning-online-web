@@ -10,6 +10,7 @@ import com.htt.elearning.token.TokenClient;
 import com.htt.elearning.token.response.TokenResponse;
 import com.htt.elearning.user.UserClient;
 import com.htt.elearning.user.response.UserResponse;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
@@ -28,10 +29,12 @@ public class NotificationServiceImpl implements NotificationService {
     private final NotificationRepository notificationRepository;
     private final UserClient userClient;
     private final ModelMapper modelMapper;
+    private final HttpServletRequest request;
 
     @Override
     public void sendNotificationToEnrolledUsers(Long courseId, String title, String body) throws Exception {
-        List<Long> enrolledUserIds = enrollmentClient.getUserIdsByCourseIdClient(courseId);
+        String token = request.getHeader("Authorization");
+        List<Long> enrolledUserIds = enrollmentClient.getUserIdsByCourseIdClient(courseId, token);
         List<TokenResponse> tokens = tokenClient.getListTokens(enrolledUserIds);
 
         for (TokenResponse fcmToken : tokens) {
@@ -46,9 +49,9 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     @Override
-    public NotificationResponse createNotification(NotificationDTO notificationDTO) {
-
-        UserResponse existingUser = userClient.getUserByIdClient(notificationDTO.getUserId());
+    public NotificationResponse createNotification(NotificationDTO notificationDTO, String token) {
+//        String token = request.getHeader("Authorization");
+        UserResponse existingUser = userClient.getUserByIdClient(notificationDTO.getUserId(), token);
         Notification newNotification = Notification.builder()
                 .title(notificationDTO.getTitle())
                 .message(notificationDTO.getMessage())

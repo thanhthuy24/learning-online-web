@@ -18,7 +18,8 @@ import java.util.Set;
 @NoArgsConstructor
 public class Category {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "category_seq")
+    @SequenceGenerator(name = "category_seq", sequenceName = "category_id_seq", allocationSize = 1)
     @Column(name = "id", nullable = false)
     private Long id;
 

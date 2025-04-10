@@ -15,6 +15,7 @@ import com.htt.elearning.score.pojo.Score;
 import com.htt.elearning.score.repository.ScoreRepository;
 import com.htt.elearning.user.UserClient;
 import com.htt.elearning.user.response.UserResponse;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -36,6 +37,7 @@ public class ScoreServiceImpl implements ScoreService {
     private final EssayRepository essayRepository;
     private final NotificationClient notificationClient;
     private final EnrollmentClient enrollmentClient;
+    private final HttpServletRequest request;
 
     @Override
     public List<Score> getScoreByAssignmentId(Long assignmentId) throws DataNotFoundException {
@@ -58,7 +60,9 @@ public class ScoreServiceImpl implements ScoreService {
 //        String username = SecurityContextHolder.getContext().getAuthentication().getName();
 //        User user = userRepository.getUserByUsername(username);
 //        if (user.getRole().getName().equals("TEACHER")){
-        Long role = userClient.getRoleIdClient();
+        String token = request.getHeader("Authorization");
+
+        Long role = userClient.getRoleIdClient(token);
         if (role == 3){
             Essay existingEssay = essayRepository.findById(essayId)
                     .orElseThrow(() -> new ResponseStatusException(
@@ -81,8 +85,8 @@ public class ScoreServiceImpl implements ScoreService {
                     .assignment(existingAssignment)
                     .userId(existingEssay.getUserId())
                     .build();
-
-            List<UserResponse> users = enrollmentClient.getUsersByCourseIdClient(existingAssignment.getCourseId());
+//            String token = request.getHeader("Authorization");
+            List<UserResponse> users = enrollmentClient.getUsersByCourseIdClient(existingAssignment.getCourseId(), token);
 
             users.forEach(user -> {
                 NotificationDTO notificationDTO = NotificationDTO.builder()
@@ -108,7 +112,8 @@ public class ScoreServiceImpl implements ScoreService {
 //        String username = SecurityContextHolder.getContext().getAuthentication().getName();
 //        User user = userRepository.getUserByUsername(username);
 //        if (user.getRole().getName().equals("TEACHER")){
-        Long role = userClient.getRoleIdClient();
+        String token = request.getHeader("Authorization");
+        Long role = userClient.getRoleIdClient(token);
         if (role == 3){
             Assignment existingAssignment = assignmentRepository
                     .findById(assignmentId)
@@ -131,7 +136,8 @@ public class ScoreServiceImpl implements ScoreService {
     public Score createScore(ScoreDTO scoreDTO) throws DataNotFoundException {
 //        String username = SecurityContextHolder.getContext().getAuthentication().getName();
 //        User user = userRepository.getUserByUsername(username);
-        Long userId = userClient.getUserIdByUsername();
+        String token = request.getHeader("Authorization");
+        Long userId = userClient.getUserIdByUsernameClient(token);
         Assignment existingAssignment = assignmentRepository
                 .findById(scoreDTO.getAssignmentId())
                 .orElseThrow(() -> new ResponseStatusException(

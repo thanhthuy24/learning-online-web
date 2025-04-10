@@ -5,6 +5,6 @@ spring:
     name: cloudinary-service
 
 cloudinary:
-  cloud-name: #my_cloud_name
-  api-key: #my_api_key
-  api-secret: #my_api_secret
+  cloud-name:  #my_cloud_name
+  api-key:  #my_api_key
+  api-secret:   #my_api_secret

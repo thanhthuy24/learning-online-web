@@ -15,10 +15,11 @@ import static org.springframework.kafka.support.KafkaHeaders.TOPIC;
 public class LessonProducer {
     private final KafkaTemplate<String, LessonCreateEvent> kafkaTemplate;
 
-    public void sendLessonCreateEvent(LessonCreateEvent lessonCreateEvent) {
+    public void sendLessonCreateEvent(LessonCreateEvent lessonCreateEvent, String token) {
         log.info("Sending create new lesson successfully");
         Message<LessonCreateEvent> message = MessageBuilder
                 .withPayload(lessonCreateEvent)
+                .setHeader("Authorization", token)
                 .setHeader(TOPIC, "lesson-topic")
                 .build();
 

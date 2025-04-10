@@ -18,7 +18,8 @@ import java.util.Date;
 @NoArgsConstructor
 public class Assignment {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "assignment_seq")
+    @SequenceGenerator(name = "assignment_seq", sequenceName = "assignment_id_seq", allocationSize = 1)
     @Column(name = "id", nullable = false)
     private Long id;
 

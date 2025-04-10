@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 @FeignClient(
         name = "course-service",
+        contextId = "courseServiceV3",
         url = "${application.config.tag-url}"
 )
 public interface TagClient {
