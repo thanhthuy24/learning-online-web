@@ -149,6 +149,7 @@ public class WebSecurityConfig {
                             .requestMatchers(GET, "api/teachers/user/").permitAll()
                             .requestMatchers(GET, "api/teachers/{teacherId}/get-teacherId").permitAll()
                             .requestMatchers(GET, "api/teachers/get-teacher-by-userId/**").permitAll()
+
                             .requestMatchers(POST, "api/teachers/**").hasAnyRole(Role.ADMIN)
                             .requestMatchers(PUT, "api/teachers/**").hasAnyRole(Role.ADMIN, Role.TEACHER)
                             .requestMatchers(DELETE, "api/teachers/**").hasAnyRole(Role.ADMIN)

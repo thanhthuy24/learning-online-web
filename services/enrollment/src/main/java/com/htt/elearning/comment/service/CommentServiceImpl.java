@@ -11,6 +11,7 @@ import com.htt.elearning.lesson.response.LessonResponse;
 import com.htt.elearning.sentiment.PerspectiveService;
 //import com.htt.elearning.sentiment.SentimentService;
 import com.htt.elearning.user.UserClient;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -31,12 +32,14 @@ public class CommentServiceImpl implements CommentService {
     private final UserClient userClient;
 //    private final SentimentService sentimentService;
     private final PerspectiveService perspectiveService;
+    private final HttpServletRequest request;
 
     @Override
     public Comment createComment(CommentDTO commentDTO) throws DataNotFoundException {
-        Long userId = userClient.getUserIdByUsername();
+        String token = request.getHeader("Authorization");
+        Long userId = userClient.getUserIdByUsername(token);
 
-        LessonResponse existingLesson = lessonClient.getLessonById(commentDTO.getLessonId());
+        LessonResponse existingLesson = lessonClient.getLessonById(commentDTO.getLessonId(), token);
         if (existingLesson == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Lesson not found");
         }
@@ -82,23 +85,21 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public Page<Comment> getComments(Long lessonId, PageRequest pageRequest) throws DataNotFoundException {
-        LessonResponse existingLesson = lessonClient.getLessonById(lessonId);
+        String token = request.getHeader("Authorization");
+        LessonResponse existingLesson = lessonClient.getLessonById(lessonId, token);
         if (existingLesson == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Lesson not found");
         }
-
-//        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-//        User user = userRepository.getUserByUsername(username);
-
         return commentRepository.getCommentByLessonId(lessonId, pageRequest)
                 .map(Comment::fromComment);
     }
 
     @Override
     public Comment createCommentChild(CommentDTO commentDTO, Long commentId) throws DataNotFoundException {
-        Long userId = userClient.getUserIdByUsername();
+        String token = request.getHeader("Authorization");
+        Long userId = userClient.getUserIdByUsername(token);
 
-        LessonResponse existingLesson = lessonClient.getLessonById(commentDTO.getLessonId());
+        LessonResponse existingLesson = lessonClient.getLessonById(commentDTO.getLessonId(), token);
         if (existingLesson == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Lesson not found");
         }
@@ -125,7 +126,8 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public Long countCommentByLessonId(Long lessonId) {
-        LessonResponse existingLesson = lessonClient.getLessonById(lessonId);
+        String token = request.getHeader("Authorization");
+        LessonResponse existingLesson = lessonClient.getLessonById(lessonId, token);
         if (existingLesson == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Lesson not found");
         }

@@ -27,4 +27,11 @@ public interface EnrollmentClient {
             @PathVariable Long courseId,
             @RequestHeader("Authorization") String token
     );
+
+    @GetMapping("check-enrollment-boolean")
+    Boolean checkEnrollmentPt2(
+            @RequestParam Long userId,
+            @RequestParam Long courseId,
+            @RequestHeader("Authorization") String token
+    );
 }

@@ -5,6 +5,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestHeader;
 
 @FeignClient(
         name = "user-service",
@@ -15,7 +16,9 @@ public interface UserClient {
     String getUsername();
 
     @GetMapping("/get-userId")
-    Long getUserIdByUsername();
+    Long getUserIdByUsername(
+            @RequestHeader("Authorization") String token
+    );
 
     @GetMapping("/get-role-id")
     Long getRoleIdClient();
@@ -25,7 +28,8 @@ public interface UserClient {
 
     @GetMapping("/get-user/{userId}")
     UserResponse getUserByIdClient(
-            @PathVariable("userId") Long userId
+            @PathVariable("userId") Long userId,
+            @RequestHeader("Authorization") String token
     );
 
     @GetMapping("/update-role-teacher/{userId}")

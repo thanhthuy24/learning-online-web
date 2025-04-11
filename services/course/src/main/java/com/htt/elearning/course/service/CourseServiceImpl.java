@@ -189,7 +189,7 @@ public class CourseServiceImpl implements CourseService {
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND, "Can not find course with id : " + courseId));
 
-        return modelMapper.map(course, CourseResponse.class);
+        return CourseResponse.fromCourse(course);
     }
 
     @Override

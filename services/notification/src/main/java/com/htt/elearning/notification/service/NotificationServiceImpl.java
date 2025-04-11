@@ -44,7 +44,8 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     public Page<Notification> findNotificationsByUserId(Pageable pageable) {
-        Long userId = userClient.getUserIdByUsername();
+        String token = request.getHeader("Authorization");
+        Long userId = userClient.getUserIdByUsername(token);
         return notificationRepository.findNotificationsByUserId(userId, pageable);
     }
 

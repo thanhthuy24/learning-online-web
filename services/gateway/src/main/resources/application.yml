@@ -10,9 +10,23 @@ logging:
     org.springframework.web: DEBUG
 
 secure:
-  open-paths:
+  open-paths-get:
     - /api/teachers/all
+    - /api/courses/**
     - /api/teachers/users/
     - /api/teachers/get-teacher-by-userId/**
+    - /api/lessons/get-first-lesson/course/**
+    - /api/lessons/count-by-course/**
+    - /api/videos/count/**
+    - /api/assignments/lesson/**
+    - /api/categories/**
+    - /api/questions/count/assignment/**
+    - /api/token/**
+  open-paths-post:
     - /api/users/login
     - /api/users/register
+    - /api/users/register-account
+    - /api/login/auth/social-login
+    - /api/login/auth/social/callback
+    - /api/cloudinary/upload
+    - /api/cloudinary/upload-image

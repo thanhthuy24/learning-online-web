@@ -12,6 +12,7 @@ import com.htt.elearning.rating.pojo.Courserating;
 import com.htt.elearning.rating.repository.CourseRatingRepository;
 import com.htt.elearning.sentiment.SentimentService;
 import com.htt.elearning.user.UserClient;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.checkerframework.checker.units.qual.C;
 import org.springframework.data.domain.Page;
@@ -33,16 +34,18 @@ public class CourseRatingServiceImpl implements CourseRatingService {
     private final CourseClient courseClient;
     private final UserClient userClient;
     private final SentimentService sentimentService;
+    private final HttpServletRequest request;
 
     @Override
     public Courserating createRating(CourseRatingDTO courseRatingDTO) throws DataNotFoundException {
-        CourseResponse existingCourse = courseClient.getCourseByIdClient(courseRatingDTO.getCourseId());
+        String token = request.getHeader("Authorization");
+        CourseResponse existingCourse = courseClient.getCourseByIdClient(courseRatingDTO.getCourseId(), token);
         if (existingCourse == null) {
             new ResponseStatusException(
                     HttpStatus.NOT_FOUND, "Course not found!!");
         };
 
-        Long userId = userClient.getUserIdByUsername();
+        Long userId = userClient.getUserIdByUsername(token);
 
         Optional<Enrollment> checkEnrollment = enrollmentRepository.
                 findByUserIdAndCourseId(userId, courseRatingDTO.getCourseId());
@@ -81,7 +84,8 @@ public class CourseRatingServiceImpl implements CourseRatingService {
 
     @Override
     public Page<Courserating> getRatingByCourseId(Long courseId, PageRequest pageRequest) throws DataNotFoundException {
-        CourseResponse existingCourse = courseClient.getCourseByIdClient(courseId);
+        String token = request.getHeader("Authorization");
+        CourseResponse existingCourse = courseClient.getCourseByIdClient(courseId, token);
         if (existingCourse == null) {
             new ResponseStatusException(
                     HttpStatus.NOT_FOUND, "Course not found!!");
@@ -93,7 +97,8 @@ public class CourseRatingServiceImpl implements CourseRatingService {
 
     @Override
     public Float averageRatingByCourseId(Long courseId) throws DataNotFoundException {
-        CourseResponse existingCourse = courseClient.getCourseByIdClient(courseId);
+        String token = request.getHeader("Authorization");
+        CourseResponse existingCourse = courseClient.getCourseByIdClient(courseId, token);
         if (existingCourse == null) {
             new ResponseStatusException(
                     HttpStatus.NOT_FOUND, "Course not found!!");
@@ -120,7 +125,8 @@ public class CourseRatingServiceImpl implements CourseRatingService {
 
     @Override
     public Long countAll(Long courseId) throws DataNotFoundException {
-        CourseResponse existingCourse = courseClient.getCourseByIdClient(courseId);
+        String token = request.getHeader("Authorization");
+        CourseResponse existingCourse = courseClient.getCourseByIdClient(courseId, token);
         if (existingCourse == null) {
             new ResponseStatusException(
                     HttpStatus.NOT_FOUND, "Course not found!!");
@@ -141,7 +147,8 @@ public class CourseRatingServiceImpl implements CourseRatingService {
 
     @Override
     public Long countRatingByCourseIdByRating(Long courseId, Long rating) throws DataNotFoundException {
-        CourseResponse existingCourse = courseClient.getCourseByIdClient(courseId);
+        String token = request.getHeader("Authorization");
+        CourseResponse existingCourse = courseClient.getCourseByIdClient(courseId, token);
         if (existingCourse == null) {
             new ResponseStatusException(
                     HttpStatus.NOT_FOUND, "Course not found!!");
@@ -156,7 +163,8 @@ public class CourseRatingServiceImpl implements CourseRatingService {
 
     @Override
     public Float averageRatingByStar(Long rate, Long courseId) throws DataNotFoundException {
-        CourseResponse existingCourse = courseClient.getCourseByIdClient(courseId);
+        String token = request.getHeader("Authorization");
+        CourseResponse existingCourse = courseClient.getCourseByIdClient(courseId, token);
         if (existingCourse == null) {
             new ResponseStatusException(
                     HttpStatus.NOT_FOUND, "Course not found!!");

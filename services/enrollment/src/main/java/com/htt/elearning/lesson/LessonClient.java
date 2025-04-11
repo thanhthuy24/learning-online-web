@@ -5,6 +5,7 @@ import com.htt.elearning.lesson.response.LessonResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestHeader;
 
 import java.util.List;
 
@@ -15,10 +16,14 @@ import java.util.List;
 )
 public interface LessonClient {
     @GetMapping("/get-lesson/{lessonId}")
-    LessonResponse getLessonById(@PathVariable("lessonId") Long lessonId);
+    LessonResponse getLessonById(
+            @PathVariable("lessonId") Long lessonId,
+            @RequestHeader("Authorization") String token
+    );
 
     @GetMapping("/get-list-lessons/{courseId}")
     List<LessonResponse> getListLessonsByCourseIdClient(
-            @PathVariable Long courseId
+            @PathVariable Long courseId,
+            @RequestHeader("Authorization") String token
     );
 }

@@ -3,6 +3,10 @@ spring:
     import: optional:configserver:http://localhost:8888
   application:
     name: cloudinary-service
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
 
 cloudinary:
   cloud-name:  #my_cloud_name

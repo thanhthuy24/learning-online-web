@@ -8,8 +8,13 @@ spring:
       port: 6379
       host: localhost
       use-redis-cache: true
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
 
 python:
   api:
     url: http://127.0.0.1:5000
+
 

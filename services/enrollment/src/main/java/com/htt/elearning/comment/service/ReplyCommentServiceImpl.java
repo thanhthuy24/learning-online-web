@@ -8,6 +8,7 @@ import com.htt.elearning.comment.repository.ReplyCommentRepository;
 import com.htt.elearning.exceptions.DataNotFoundException;
 import com.htt.elearning.lesson.LessonClient;
 import com.htt.elearning.user.UserClient;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
 import org.springframework.http.HttpStatus;
@@ -22,6 +23,7 @@ public class ReplyCommentServiceImpl implements ReplyCommentService {
     private final ReplyCommentRepository replyCommentRepository;
     private final CommentRepository commentRepository;
     private final UserClient userClient;
+    private final HttpServletRequest request;
 
     @Override
     public Replycomment createReplyComment(ReplyDTO replyDTO) throws DataNotFoundException {
@@ -29,7 +31,8 @@ public class ReplyCommentServiceImpl implements ReplyCommentService {
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND, "Comment not found!!!"));
 
-        Long userId = userClient.getUserIdByUsername();
+        String token = request.getHeader("Authorization");
+        Long userId = userClient.getUserIdByUsername(token);
 
         Replycomment newReplyComment = Replycomment.builder()
                 .content(replyDTO.getContent())

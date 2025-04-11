@@ -4,11 +4,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
+import org.springframework.util.AntPathMatcher;
+
 
 @RequiredArgsConstructor
 @Component
@@ -18,9 +21,23 @@ public class AuthenticationHeaderFilter implements GlobalFilter {
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         String path = exchange.getRequest().getURI().getPath();
+        HttpMethod method = exchange.getRequest().getMethod();
+        AntPathMatcher matcher = new AntPathMatcher();
 
-        // Nếu là public API, không cần token
-        if (openApiConfig.getOpenPaths().stream().anyMatch(path::startsWith)) {
+//        // Nếu là public API, không cần token
+//        if ((method == HttpMethod.GET || method == HttpMethod.POST) &&
+//                openApiConfig.getOpenPaths().stream().anyMatch(pattern -> matcher.match(pattern, path))) {
+//            return chain.filter(exchange);
+//        }
+        // Nếu là GET và match trong open-paths-get
+        boolean isOpenGet = method == HttpMethod.GET &&
+                openApiConfig.getOpenPathsGet().stream().anyMatch(pattern -> matcher.match(pattern, path));
+
+        // Nếu match trong open-paths-all (mọi method đều được)
+        boolean isOpenPost = method == HttpMethod.POST &&
+                openApiConfig.openPathsPost().stream().anyMatch(pattern -> matcher.match(pattern, path));
+
+        if (isOpenGet || isOpenPost) {
             return chain.filter(exchange);
         }
 

@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.util.Map;
 
 @RestController
-@RequestMapping("api/cloudinary")
+@RequestMapping("/api/cloudinary")
 @RequiredArgsConstructor
 public class CloudinaryController {
     private final CloudinaryService cloudinaryService;

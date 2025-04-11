@@ -10,6 +10,7 @@ import com.htt.elearning.lesson.service.LessonService;
 import com.htt.elearning.video.dtos.VideoDTO;
 import com.htt.elearning.video.pojo.Video;
 import com.htt.elearning.video.service.VideoService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
@@ -33,6 +34,7 @@ public class ApiLessonController {
     private final CloudinaryClient cloudinaryClient;
     private final VideoService videoService;
 //    private final NotificationService notificationService;
+    private final HttpServletRequest request;
 
     @GetMapping("")
     public ResponseEntity<LessonListResponse> getLessons(
@@ -90,8 +92,10 @@ public class ApiLessonController {
     @PostMapping(value = "/uploads/{lessonId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> uploadVideos(
             @PathVariable("lessonId") Long lessonId,
-            @ModelAttribute("files") List<MultipartFile> files,
-            @ModelAttribute("description") String description
+            @RequestParam("files") List<MultipartFile> files,
+            @RequestParam("description") String description
+//            @ModelAttribute("files") List<MultipartFile> files,
+//            @ModelAttribute("description") String description
     ) {
         try {
             Lesson existingLesson = lessonService.getLessonById(lessonId);
@@ -108,7 +112,7 @@ public class ApiLessonController {
                 }
                 if(file.getSize() > 20 * 1024 * 1024) {
                     return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE)
-                            .body("File is too large! Maximum size is 10MB");
+                            .body("File is too large! Maximum size is 20MB");
                 }
 
                 // tai file len cloudinary va lay URl
@@ -132,8 +136,13 @@ public class ApiLessonController {
 
     private String storeFile(MultipartFile file) /*throws IOException*/ {
         // tai file len cloudinary va lay URl
-        Map<String, Object> uploadResult = cloudinaryClient.uploadFileImage(file);
-        return uploadResult.get("url").toString();
+        try {
+            String token = request.getHeader("Authorization");
+            Map<String, Object> uploadResult = cloudinaryClient.uploadFileImage(file, token);
+            return uploadResult.get("url").toString();
+        } catch (Exception e) {
+            throw new RuntimeException("Error uploading file to Cloudinary: " + e.getMessage());
+        }
     }
 
     @PutMapping("/{lessonId}")

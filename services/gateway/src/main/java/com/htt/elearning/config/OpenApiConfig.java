@@ -9,13 +9,23 @@ import java.util.List;
 @ConfigurationProperties(prefix = "secure")
 public class OpenApiConfig {
 
-    private List<String> openPaths;
+    private List<String> openPathsGet;
+    private List<String> openPathsPost;
 
-    public List<String> getOpenPaths() {
-        return openPaths;
+    // Getters và Setters
+    public List<String> getOpenPathsGet() {
+        return openPathsGet;
     }
 
-    public void setOpenPaths(List<String> openPaths) {
-        this.openPaths = openPaths;
+    public void setOpenPathsGet(List<String> openPathsGet) {
+        this.openPathsGet = openPathsGet;
+    }
+
+    public List<String> openPathsPost() {
+        return openPathsPost;
+    }
+
+    public void setOpenPathsPost(List<String> openPathsPost) {
+        this.openPathsPost = openPathsPost;
     }
 }

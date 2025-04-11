@@ -10,4 +10,5 @@ public interface RegisterRepository extends JpaRepository<Register, Long> {
     Register findByUserId(Long userId);
     List<Register> findRegisterByUserId(Long userId);
 
+//    Register findByUs
 }

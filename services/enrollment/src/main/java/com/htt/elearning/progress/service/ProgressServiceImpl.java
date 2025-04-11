@@ -12,6 +12,7 @@ import com.htt.elearning.progress.repository.ProgressRepository;
 import com.htt.elearning.user.UserClient;
 import com.htt.elearning.video.VideoClient;
 import com.htt.elearning.videocompleted.VideoCompletedClient;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -31,21 +32,23 @@ public class ProgressServiceImpl implements ProgressService {
     private final LessonClient lessonClient;
     private final CourseClient courseClient;
     private final EnrollmentRepository enrollmentRepository;
+    private final HttpServletRequest request;
 
     @Override
     public float calculateProgress(Long courseId) {
-        List<LessonResponse> lessonList = lessonClient.getListLessonsByCourseIdClient(courseId);
+        String token = request.getHeader("Authorization");
+        List<LessonResponse> lessonList = lessonClient.getListLessonsByCourseIdClient(courseId, token);
 
         if (lessonList.isEmpty())
             return 0f;
 
-        Long userId = userClient.getUserIdByUsername();
+        Long userId = userClient.getUserIdByUsername(token);
 
         Long totalVideoByLesson = 0L;
         Long totalVideoCompleted = 0L;
         for (LessonResponse lesson : lessonList) {
-            Long videoCount = videoClient.getLessonCountClient(lesson.getId());
-            Long videoCompleted = videoCompletedClient.countVideoCompletedBy(lesson.getId());
+            Long videoCount = videoClient.getLessonCountClient(lesson.getId(), token);
+            Long videoCompleted = videoCompletedClient.countVideoCompletedBy(lesson.getId(), token);
             totalVideoByLesson += videoCount;
             totalVideoCompleted += videoCompleted;
         }
@@ -67,7 +70,7 @@ public class ProgressServiceImpl implements ProgressService {
             return existingProgress.getCompletionPercentage();
         }
 
-        CourseResponse existingCourse = courseClient.getCourseByIdClient(courseId);
+        CourseResponse existingCourse = courseClient.getCourseByIdClient(courseId, token);
         if (existingCourse == null) {
             throw new DataNotFoundException("Course not found");
         }
@@ -111,15 +114,15 @@ public class ProgressServiceImpl implements ProgressService {
         Progress progress1 = progressRepository.findProgressByCourseIdAndUserId(courseId, userId);
         if (progress1.getCompletionPercentage() != 100) {
             return false;
-//            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Course hasn't been completed");
         }
         return true;
     }
 
     @Override
     public Optional<Progress> getProgressByUser(Long courseId){
-        Long userId = userClient.getUserIdByUsername();
-        Long role = userClient.getRoleIdClient();
+        String token = request.getHeader("Authorization");
+        Long userId = userClient.getUserIdByUsername(token);
+        Long role = userClient.getRoleIdClient(token);
         if(role == 1) { //role = 3 -> teacher
             Optional<Enrollment> checkEnrollment = enrollmentRepository.findByUserIdAndCourseId(userId, courseId);
             if (checkEnrollment.isEmpty()) {

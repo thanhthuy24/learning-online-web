@@ -232,8 +232,9 @@ public class LessonServiceImpl implements LessonService {
                 .lesson(existingLesson)
                 .build();
 
+        Long size = videoRepository.countByLessonId(lessonId);
         //khong cho insert qua 5 video trong 1 lesson
-        int size = videoRepository.findByLessonId(lessonId).size();
+//        int size = videoRepository.findByLessonId(lessonId).size();
         if (size >= Video.MAXIMUM_VIDEOS_PER_LESSON) {
             throw new InvalidParamException("Number of videos must be <= " + Video.MAXIMUM_VIDEOS_PER_LESSON);
         }
@@ -257,7 +258,7 @@ public class LessonServiceImpl implements LessonService {
         Lesson lesson = lessonRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND, "Cannot find lesson by id " + id));
-        return modelMapper.map(lesson, LessonResponse.class);
+        return LessonResponse.fromLesson(lesson);
     }
 
     @Override

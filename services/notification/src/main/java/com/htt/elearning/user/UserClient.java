@@ -17,7 +17,7 @@ public interface UserClient {
     String getUsername();
 
     @GetMapping("/get-userId")
-    Long getUserIdByUsername();
+    Long getUserIdByUsername(@RequestHeader("Authorization") String token);
 
     @GetMapping("/get-role-id")
     Long getRoleIdClient();

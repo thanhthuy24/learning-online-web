@@ -33,7 +33,7 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
     Page<Course>  getCoursesByPrice(@Param("minPrice") Float minPrice, @Param("maxPrice") Float maxPrice, Pageable pageable);
 //    Page<Course> getCoursesByTeacherId(Long teacherId, Pageable pageable);
 
-    @Query("SELECT c.id FROM Course c WHERE c.id IN :ids")
+    @Query("SELECT c FROM Course c WHERE c.id IN :ids")
     List<Course> findCoursesByIds(@Param("ids") List<Long> ids);
 
     @Query("SELECT c FROM Course c WHERE " +

@@ -10,6 +10,7 @@ import com.htt.elearning.course.response.CourseResponseRedis;
 import com.htt.elearning.course.response.CourseResponseRedisList;
 import com.htt.elearning.course.service.CourseRedisService;
 import com.htt.elearning.course.service.CourseService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -34,6 +35,7 @@ public class ApiCourseController {
     private final CourseService courseService;
     private static final Logger logger = LoggerFactory.getLogger(ApiCourseController.class);
     private final CourseRedisService courseRedisService;
+    private final HttpServletRequest request;
 
     //hien thi tat ca courses
     @GetMapping("")
@@ -175,7 +177,8 @@ public class ApiCourseController {
     }
 
     private String storeFile(MultipartFile file) throws IOException {
-        Map<String, Object> uploadResult = cloudinaryClient.uploadFileImage(file);
+        String token = request.getHeader("Authorization");
+        Map<String, Object> uploadResult = cloudinaryClient.uploadFileImage(file, token);
         return uploadResult.get("url").toString();
     }
 

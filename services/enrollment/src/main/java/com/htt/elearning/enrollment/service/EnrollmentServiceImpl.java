@@ -43,14 +43,16 @@ public class EnrollmentServiceImpl implements EnrollmentService {
 
     @Override
     public List<Enrollment> getEnrollmentByUser() {
-        Long userId = userClient.getUserIdByUsername();
+        String token = request.getHeader("Authorization");
+        Long userId = userClient.getUserIdByUsername(token);
         List<Enrollment> enrollments = enrollmentRepository.findByUserId(userId);
         return enrollments;
     }
 
     @Override
     public List<Enrollment> getCousesEnrolledByUser(Long userId) {
-        Long role = userClient.getRoleIdClient();
+        String token = request.getHeader("Authorization");
+        Long role = userClient.getRoleIdClient(token);
         if (role != 2){
             throw new ResponseStatusException(
                     HttpStatus.FORBIDDEN, "Authorization!!"
@@ -61,12 +63,14 @@ public class EnrollmentServiceImpl implements EnrollmentService {
 
     @Override
     public Enrollment createEnrollment(EnrollmentDTO enrollmentDTO) {
-        CourseResponse existingCourse = courseClient.getCourseByIdClient(enrollmentDTO.getCourseId());
+        String token = request.getHeader("Authorization");
+        CourseResponse existingCourse = courseClient.getCourseByIdClient(enrollmentDTO.getCourseId(), token);
         if (existingCourse == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Cannot find course with id "
                     + enrollmentDTO.getCourseId());
         }
-        Long userId = userClient.getUserIdByUsername();
+//        String token = request.getHeader("Authorization");
+        Long userId = userClient.getUserIdByUsername(token);
 
         Optional<Enrollment> enrollments = enrollmentRepository.findByUserIdAndCourseId(
                 userId, enrollmentDTO.getCourseId());
@@ -87,7 +91,8 @@ public class EnrollmentServiceImpl implements EnrollmentService {
 
     @Override
     public Long countEnrollmentByUserId(Long userId) {
-        Long role = userClient.getRoleIdClient();
+        String token = request.getHeader("Authorization");
+        Long role = userClient.getRoleIdClient(token);
         if (role != 2){
             throw new ResponseStatusException(
                     HttpStatus.FORBIDDEN, "Authorization!!"
@@ -110,7 +115,8 @@ public class EnrollmentServiceImpl implements EnrollmentService {
 
     @Override
     public Long getCountEnrollmentByCourseId(Long courseId) {
-        CourseResponse existingCourse = courseClient.getCourseByIdClient(courseId);
+        String token = request.getHeader("Authorization");
+        CourseResponse existingCourse = courseClient.getCourseByIdClient(courseId, token);
         if (existingCourse == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Cannot find course with id "
                     + courseId);

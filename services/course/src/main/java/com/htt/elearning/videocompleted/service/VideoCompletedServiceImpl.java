@@ -41,7 +41,7 @@ public class VideoCompletedServiceImpl implements VideoCompletedService {
             new ResponseStatusException(HttpStatus.NOT_FOUND, "Video already completed!");
         }
 
-        Boolean checkEnrollment = enrollmentClient.checkEnrollment(userId, existingVideo.getLesson().getCourse().getId());
+        Boolean checkEnrollment = enrollmentClient.checkEnrollmentPt2(userId, existingVideo.getLesson().getCourse().getId(), token);
         if (checkEnrollment == null || !checkEnrollment) {
             new ResponseStatusException(HttpStatus.NOT_FOUND,
                     "This course isn't enrolled in your list! Please enroll before participating in this course!!");

@@ -5,6 +5,7 @@ import com.htt.elearning.register.pojo.Register;
 import com.htt.elearning.register.repository.RegisterRepository;
 import com.htt.elearning.user.UserClient;
 import com.htt.elearning.user.response.UserResponse;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -17,6 +18,7 @@ import java.util.List;
 public class RegisterServiceImpl implements RegisterService{
     private final RegisterRepository registerRepository;
     private final UserClient userClient;
+    private final HttpServletRequest request;
 
     @Override
     public List<Register> getAllRegisters() {
@@ -44,7 +46,8 @@ public class RegisterServiceImpl implements RegisterService{
 
     @Override
     public List<Register> getListFormByUserId() {
-        Long userId = userClient.getUserIdByUsername();
+        String token = request.getHeader("Authorization");
+        Long userId = userClient.getUserIdByUsername(token);
 
         List<Register> list = registerRepository.findRegisterByUserId(userId);
 
@@ -80,7 +83,8 @@ public class RegisterServiceImpl implements RegisterService{
 
     @Override
     public Register createRegister(RegisterDTO registerDTO) {
-        Long userId = userClient.getUserIdByUsername();
+        String token = request.getHeader("Authorization");
+        Long userId = userClient.getUserIdByUsername(token);
 
         Register newRegister = Register.builder()
                 .reason(registerDTO.getReason())
@@ -94,10 +98,11 @@ public class RegisterServiceImpl implements RegisterService{
 
     @Override
     public Register updateRegister(RegisterDTO registerDTO, Long id) {
+        String token = request.getHeader("Authorization");
         Register existingRegister = registerRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Not found"));
         if (existingRegister != null) {
-            UserResponse user = userClient.getUserByIdClient(registerDTO.getUserId());
+            UserResponse user = userClient.getUserByIdClient(registerDTO.getUserId(), token);
 
             if (user != null) {
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
