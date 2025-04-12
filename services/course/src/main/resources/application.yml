@@ -17,4 +17,7 @@ python:
   api:
     url: http://127.0.0.1:5000
 
+jwt:
+  expiration: 2592000
+  secretKey: CmAl9817K7+5oGiE8aq53pL9w0JPaoMHLFBeFfE1xfk= #secretKey
 

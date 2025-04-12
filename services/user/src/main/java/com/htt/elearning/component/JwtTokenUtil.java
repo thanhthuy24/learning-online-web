@@ -31,8 +31,8 @@ public class JwtTokenUtil {
 
     public String generateToken(User user) throws InvalidParamException {
         Map<String, String> claims = new HashMap<>();
-//        this.generateSecretKey();
         claims.put("username", user.getUsername());
+        claims.put("role", user.getRole().getName());
         try {
             String token = Jwts.builder()
                     .setClaims(claims) //how to extract claims from this ?
@@ -79,6 +79,10 @@ public class JwtTokenUtil {
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
+    }
+
+    public String extractRole(String token) {
+        return extractAllClaims(token).get("role", String.class);
     }
 
     public boolean validateToken(String token, UserDetails userDetails) {

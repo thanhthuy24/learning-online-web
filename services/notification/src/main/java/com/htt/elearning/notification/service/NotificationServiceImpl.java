@@ -35,7 +35,7 @@ public class NotificationServiceImpl implements NotificationService {
     public void sendNotificationToEnrolledUsers(Long courseId, String title, String body) throws Exception {
         String token = request.getHeader("Authorization");
         List<Long> enrolledUserIds = enrollmentClient.getUserIdsByCourseIdClient(courseId, token);
-        List<TokenResponse> tokens = tokenClient.getListTokens(enrolledUserIds);
+        List<TokenResponse> tokens = tokenClient.getListTokens(enrolledUserIds, token);
 
         for (TokenResponse fcmToken : tokens) {
             firebaseMessagingService.sendNotification(fcmToken.getToken(), title, body);

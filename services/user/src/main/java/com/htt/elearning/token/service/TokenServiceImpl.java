@@ -12,6 +12,7 @@ import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
@@ -25,7 +26,7 @@ public class TokenServiceImpl implements TokenService {
     private final ModelMapper modelMapper;
 
     @Override
-    public Token createToken(TokenDTO tokenDTO) throws DataNotFoundException {
+    public TokenResponse createToken(TokenDTO tokenDTO) throws DataNotFoundException {
         User existingUser = userRepository.findById(tokenDTO.getUserId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found!!"));
 
@@ -39,7 +40,8 @@ public class TokenServiceImpl implements TokenService {
                 .user(existingUser)
                 .build();
         tokenRepository.save(newToken);
-        return newToken;
+
+        return TokenResponse.fromToken(newToken);
     }
 
     @Override
@@ -65,7 +67,12 @@ public class TokenServiceImpl implements TokenService {
     }
 
     @Override
-    public void removeFcmToken(String token) {
+    public void removeFcmToken(
+            @RequestHeader("Authorization") String token
+    ) {
+        if (token != null && token.startsWith("Bearer ")) {
+            token = token.substring(7); // Cắt bỏ "Bearer "
+        }
         tokenRepository.findByToken(token).ifPresent(tokenRepository::delete);
     }
 

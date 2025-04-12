@@ -5,6 +5,7 @@ import com.htt.elearning.token.dto.TokenDTO;
 import com.htt.elearning.token.pojo.Token;
 import com.htt.elearning.token.response.TokenResponse;
 import com.htt.elearning.token.service.TokenService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +20,9 @@ import java.util.Map;
 @RequestMapping("api/token")
 @RequiredArgsConstructor
 public class TokenController {
-    public final TokenService tokenService;
+    private final TokenService tokenService;
+    private final HttpServletRequest request;
+
     @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<?> createToken(
@@ -33,14 +36,14 @@ public class TokenController {
                     .toList();
             return ResponseEntity.badRequest().body(errorMessages);
         }
-        Token token = tokenService.createToken(tokenDTO);
+        TokenResponse token = tokenService.createToken(tokenDTO);
         return ResponseEntity.ok(token);
     }
 
     //    xóa thông tin bằng token
     @PostMapping("/remove-token")
-    public ResponseEntity<String> removeFcmToken(@RequestBody Map<String, String> request) {
-        String token = request.get("token");
+    public ResponseEntity<String> removeFcmToken() {
+        String token = request.getHeader("Authorization");
 
         tokenService.removeFcmToken(token);
         return ResponseEntity.ok("FCM Token removed successfully");
@@ -57,7 +60,7 @@ public class TokenController {
 
     @GetMapping("/get-list-tokens")
     public List<TokenResponse> getListTokens(
-            @PathVariable List<Long> userIds
+            @RequestParam List<Long> userIds
     ){
         return tokenService.getListTokens(userIds);
     }

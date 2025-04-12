@@ -16,7 +16,8 @@ public class GatewayConfig {
                                 "/api/users/**",
                                 "/api/roles/**",
                                 "/api/teachers/**",
-                                "/api/token/**")
+                                "/api/token/**",
+                                "/api/teacher/**")
                         .uri("lb://USER-SERVICE"))
                 .route("courses-service",
                         r -> r.path(

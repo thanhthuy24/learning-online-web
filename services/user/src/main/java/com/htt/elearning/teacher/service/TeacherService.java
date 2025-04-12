@@ -17,6 +17,8 @@ public interface TeacherService {
     Teacher getTeacherByUserId(Long userId);
     List<Teacher> getAll();
 
+    Teacher getInformation(Long teacherId);
+
 //    techer-client
     TeacherResponse getTeacherByIdClient(Long id);
     TeacherResponse getTeacherByUserIdClient(Long userId);

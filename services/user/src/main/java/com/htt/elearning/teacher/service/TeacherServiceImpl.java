@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.*;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -25,6 +26,13 @@ public class TeacherServiceImpl implements TeacherService {
 
     @Override
     public Teacher createTeacher(TeacherDTO teacherDTO) {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        Long roleId = userRepository.findByUsername(username).get().getRole().getId();
+
+        if (roleId != 2) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You must be ADMIN!!");
+        }
+
         User existUser = userRepository
                 .findById(teacherDTO.getUserId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Can not find user by id: " + teacherDTO.getUserId()));
@@ -63,7 +71,9 @@ public class TeacherServiceImpl implements TeacherService {
 
     @Override
     public Teacher updateTeacher(Long id, TeacherDTO teacherDTO) {
-        Teacher existingTeacher = getTeacherById(id);
+        Teacher existingTeacher = teacherRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Can not find teacher by id: " + id));
         if(existingTeacher != null) {
             User existingUser = userRepository.findById(teacherDTO.getUserId())
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Can not find user by id: " + teacherDTO.getUserId()));
@@ -103,5 +113,19 @@ public class TeacherServiceImpl implements TeacherService {
             return null;
         }
         return TeacherResponse.fromTeacher(teacher);
+    }
+
+    @Override
+    public Teacher getInformation(Long teacherId){
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        Long userId = userRepository.findByUsername(username).get().getId();
+
+        Long id = teacherRepository.findById(teacherId).get().getUserId();
+
+        if (id == userId) {
+            Teacher teacher = teacherRepository.findById(teacherId).get();
+            return teacher;
+        }
+        return null;
     }
 }

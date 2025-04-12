@@ -30,7 +30,7 @@ public class Receiptdetail {
     @Column(name = "course_id")
     private Long courseId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "receipt_id")
     private Receipt receipt;
 

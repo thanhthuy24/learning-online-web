@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
@@ -72,6 +73,7 @@ public class ApiTeacherController {
         return ResponseEntity.ok(teacher);
     }
 
+
     @PutMapping("/{teacherId}")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<?> updateTeacher(
@@ -86,7 +88,6 @@ public class ApiTeacherController {
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<?> deleteTeacher(
             @PathVariable("teacherId") Long teacherId
-
     ){
         teacherService.deleteTeacher(teacherId);
         return  ResponseEntity.ok("delete teacher successfully!!");
@@ -102,6 +103,7 @@ public class ApiTeacherController {
 
 //    teacher - client
 
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @GetMapping("/{teacherId}/get-teacherId")
     @ResponseStatus(HttpStatus.OK)
     public TeacherResponse getTeacherClientById(

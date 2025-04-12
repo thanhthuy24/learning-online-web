@@ -19,7 +19,8 @@ secure:
     - /api/lessons/count-by-course/**
     - /api/videos/count/**
     - /api/assignments/lesson/**
-    - /api/categories/**
+    - /api/category/**
+    - /api/tags/**
     - /api/questions/count/assignment/**
     - /api/token/**
   open-paths-post:
@@ -30,3 +31,4 @@ secure:
     - /api/login/auth/social/callback
     - /api/cloudinary/upload
     - /api/cloudinary/upload-image
+    - /api/token

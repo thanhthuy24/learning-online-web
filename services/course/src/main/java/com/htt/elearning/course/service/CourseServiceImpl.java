@@ -130,7 +130,6 @@ public class CourseServiceImpl implements CourseService {
         String token = request.getHeader("Authorization");
         Long userId = userClient.getUserIdByUsernameClient(token);
 
-
         TeacherResponse existingTeacher = Optional.ofNullable(teacherClient.getTeacherById(teacherId, token))
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "Can not find teacher with id: " + teacherId));

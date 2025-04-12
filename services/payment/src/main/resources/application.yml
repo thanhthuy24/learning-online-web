@@ -13,8 +13,8 @@ momo:
 
 paypal:
   client:
-    id: #id
-    secret: #secret
+    id:  #id
+    secret:  #secret
   mode: sandbox
 
 

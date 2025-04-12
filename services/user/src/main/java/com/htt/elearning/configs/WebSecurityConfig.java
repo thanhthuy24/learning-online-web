@@ -142,17 +142,22 @@ public class WebSecurityConfig {
 
                             .requestMatchers(POST, "api/spell-check").hasAnyRole(Role.USER)
 
-                            .requestMatchers(POST, "api/token").permitAll()
+                            .requestMatchers(GET, "api/token/get-list-tokens").hasAnyRole(Role.ADMIN, Role.TEACHER, Role.USER)
+                            .requestMatchers(POST, "/api/token").permitAll()
                             .requestMatchers(DELETE, "api/token/userId").permitAll()
+                            .requestMatchers(DELETE, "api/token/remove-token").hasAnyRole(Role.USER)
 
                             .requestMatchers(GET, "api/teachers/all").permitAll()
                             .requestMatchers(GET, "api/teachers/user/").permitAll()
                             .requestMatchers(GET, "api/teachers/{teacherId}/get-teacherId").permitAll()
                             .requestMatchers(GET, "api/teachers/get-teacher-by-userId/**").permitAll()
+                            .requestMatchers(GET, "/api/teachers/{teacherId}").hasAnyRole(Role.ADMIN)
 
-                            .requestMatchers(POST, "api/teachers/**").hasAnyRole(Role.ADMIN)
-                            .requestMatchers(PUT, "api/teachers/**").hasAnyRole(Role.ADMIN, Role.TEACHER)
-                            .requestMatchers(DELETE, "api/teachers/**").hasAnyRole(Role.ADMIN)
+                            .requestMatchers(GET, "/api/teacher/get-information/").hasAnyRole(Role.TEACHER, Role.ADMIN)
+
+                            .requestMatchers(POST, "/api/teachers/**").hasAnyRole(Role.ADMIN)
+                            .requestMatchers(PUT, "/api/teachers/**").hasAnyRole(Role.ADMIN)
+                            .requestMatchers(DELETE, "/api/teachers/**").hasAnyRole(Role.ADMIN)
 
                             .requestMatchers(GET, "api/users/all-users").hasAnyRole(Role.ADMIN)
                             .requestMatchers(GET, "api/users/auth/").permitAll()

@@ -179,14 +179,22 @@ public class UserController {
     }
 
     @PostMapping("login")
-    public ResponseEntity<String> loginUser(@Valid @RequestBody UserLoginDTO userLoginDTO) {
-        //kiểm tra thông tin đăng nhập và token
+    public ResponseEntity<LoginResponseDTO> loginUser(@Valid @RequestBody UserLoginDTO userLoginDTO) {
         try {
             String token = userService.login(userLoginDTO.getUsername(), userLoginDTO.getPassword());
-            return ResponseEntity.ok(token);
+            return ResponseEntity.ok(new LoginResponseDTO(token));
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity
+                    .badRequest()
+                    .body(new LoginResponseDTO("Login failed: " + e.getMessage()));
         }
+        //kiểm tra thông tin đăng nhập và token
+//        try {
+//            String token = userService.login(userLoginDTO.getUsername(), userLoginDTO.getPassword());
+//            return ResponseEntity.ok(token);
+//        } catch (Exception e) {
+//            return ResponseEntity.badRequest().body(e.getMessage());
+//        }
         // trả về token trong response
 
     }

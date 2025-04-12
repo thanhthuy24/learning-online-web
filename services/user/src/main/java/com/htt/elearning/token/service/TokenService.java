@@ -8,7 +8,7 @@ import com.htt.elearning.token.response.TokenResponse;
 import java.util.List;
 
 public interface TokenService {
-    Token createToken(TokenDTO tokenDTO) throws DataNotFoundException;
+    TokenResponse createToken(TokenDTO tokenDTO) throws DataNotFoundException;
     void saveToken(String token, Long userId);
     void removeTokensByUserId(Long userId);
     void removeFcmToken(String token);

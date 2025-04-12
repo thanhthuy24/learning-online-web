@@ -28,7 +28,7 @@ public class Role {
     public static String USER = "USER";
     public static String TEACHER = "TEACHER";
 
-    @OneToMany(mappedBy = "role")
-    private Set<User> users = new LinkedHashSet<>();
+//    @OneToMany(mappedBy = "role")
+//    private Set<User> users = new LinkedHashSet<>();
 
 }

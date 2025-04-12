@@ -12,6 +12,7 @@ import com.htt.elearning.receipt.response.ReceiptResponse;
 import com.htt.elearning.receiptdetail.pojo.Receiptdetail;
 import com.htt.elearning.receiptdetail.repository.ReceiptDetailRepository;
 import com.htt.elearning.user.UserClient;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
@@ -34,6 +35,7 @@ public class ReceiptServiceImpl implements ReceiptService {
     private final UserClient userClient;
     private final CourseClient courseClient;
     private final ModelMapper modelMapper;
+    private final HttpServletRequest request;
 
     @Override
     public Page<Receipt> getAllReceipts(PageRequest pageRequest, String keyword) {
@@ -58,10 +60,11 @@ public class ReceiptServiceImpl implements ReceiptService {
     public Receipt createReceipt(ReceiptDTO receiptDTO) {
         //convert ReceiptDTO -> Receipt in database
         // tao luong bang anh xa rieng de kiem soat viec anh xa
+        String token = request.getHeader("Authorization");
         modelMapper.typeMap(ReceiptDTO.class, Receipt.class)
                 .addMappings(mapper -> mapper.skip(Receipt::setId));
 
-        Long userId = userClient.getUserIdByUsername();
+        Long userId = userClient.getUserIdByUsername(token);
 
         //cap nhat cac truong cua don hang tu ReceiptDTO
         Receipt receipt = new Receipt();
@@ -84,14 +87,15 @@ public class ReceiptServiceImpl implements ReceiptService {
 
     @Override
     public void addReceipt(List<Cart> cartList) throws DataNotFoundException {
+        String token = request.getHeader("Authorization");
         if (cartList != null){
-            Long userId = userClient.getUserIdByUsername();
+            Long userId = userClient.getUserIdByUsername(token);
 
             for (Cart cart : cartList) {
                 Long courseId = cart.getId();
                 Long count = 0L;
 
-                Boolean enrollment = enrollmentClient.checkEnrollment(userId, courseId);
+                Boolean enrollment = enrollmentClient.checkEnrollment(userId, courseId, token);
                 if (!enrollment) {
                     count++;
                 }
@@ -125,7 +129,7 @@ public class ReceiptServiceImpl implements ReceiptService {
                 enrollmentDTO.setEnrollmentDate(new Date());
                 enrollmentDTO.setCourseId(c.getId());
 
-                enrollmentClient.createEnrollmentClient(enrollmentDTO);
+                enrollmentClient.createEnrollmentClient(enrollmentDTO, token);
 
 //                Enrollment enrollment = new Enrollment();
 //                enrollment.setEnrollmentDate(new Date());

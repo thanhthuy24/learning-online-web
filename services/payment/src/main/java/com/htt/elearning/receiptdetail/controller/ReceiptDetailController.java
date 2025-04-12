@@ -51,7 +51,7 @@ public class ReceiptDetailController {
     ) {
         try{
             Receiptdetail existingReceiptdetail = receiptDetailService.getReceiptDetail(id);
-            return ResponseEntity.ok().body(existingReceiptdetail);
+            return ResponseEntity.ok(existingReceiptdetail);
         } catch(Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
@@ -74,8 +74,8 @@ public class ReceiptDetailController {
             @PathVariable("id") Long id
     ) {
         try{
-            List<Receiptdetail> receiptDeatils = receiptDetailService.findByReceiptId(id);
-            return ResponseEntity.ok(receiptDeatils);
+            List<Receiptdetail> receiptdetails = receiptDetailService.findByReceiptId(id);
+            return ResponseEntity.ok(receiptdetails);
         } catch(Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

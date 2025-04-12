@@ -117,7 +117,7 @@ public class ApiEnrollmentController {
             @RequestBody EnrollmentDTO enrollmentDTO
     ){
         Enrollment newEnrollment = enrollmentService.createEnrollment(enrollmentDTO);
-        return modelMapper.map(newEnrollment, EnrollmentResponse.class);
+        return EnrollmentResponse.fromEnrollment(newEnrollment);
     }
 
 }

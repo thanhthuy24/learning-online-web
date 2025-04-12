@@ -24,11 +24,6 @@ public class AuthenticationHeaderFilter implements GlobalFilter {
         HttpMethod method = exchange.getRequest().getMethod();
         AntPathMatcher matcher = new AntPathMatcher();
 
-//        // Nếu là public API, không cần token
-//        if ((method == HttpMethod.GET || method == HttpMethod.POST) &&
-//                openApiConfig.getOpenPaths().stream().anyMatch(pattern -> matcher.match(pattern, path))) {
-//            return chain.filter(exchange);
-//        }
         // Nếu là GET và match trong open-paths-get
         boolean isOpenGet = method == HttpMethod.GET &&
                 openApiConfig.getOpenPathsGet().stream().anyMatch(pattern -> matcher.match(pattern, path));
@@ -55,17 +50,4 @@ public class AuthenticationHeaderFilter implements GlobalFilter {
         exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
         return exchange.getResponse().setComplete();
     }
-//    @Override
-//    public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
-//        String token = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
-//        if (token != null && token.startsWith("Bearer ")) {
-//            ServerHttpRequest request = exchange.getRequest()
-//                    .mutate()
-//                    .header(HttpHeaders.AUTHORIZATION, token)
-//                    .build();
-//            return chain.filter(exchange.mutate().request(request).build());
-//        }
-//        System.out.println("Token: " + token);
-//        return chain.filter(exchange);
-//    }
 }

@@ -34,9 +34,10 @@ public class ReceiptDetailServiceImpl implements ReceiptDetailService {
 
     @Override
     public Receiptdetail getReceiptDetail(Long id) {
-        return receiptDetailRepository.findById(id)
+        Receiptdetail receiptdetail = receiptDetailRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND, "Cannot find receipt detail id "  + id));
+        return receiptdetail;
     }
 
     @Override
