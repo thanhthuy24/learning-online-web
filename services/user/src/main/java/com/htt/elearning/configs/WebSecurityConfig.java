@@ -13,9 +13,9 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
-@Configuration
-@EnableWebSecurity
-@EnableWebMvc
+//@Configuration
+//@EnableWebSecurity
+//@EnableWebMvc
 @RequiredArgsConstructor
 public class WebSecurityConfig {
     private final JwtTokenFilter jwtTokenFilter;
@@ -153,7 +153,7 @@ public class WebSecurityConfig {
                             .requestMatchers(GET, "api/teachers/get-teacher-by-userId/**").permitAll()
                             .requestMatchers(GET, "/api/teachers/{teacherId}").hasAnyRole(Role.ADMIN)
 
-                            .requestMatchers(GET, "/api/teacher/get-information/").hasAnyRole(Role.TEACHER, Role.ADMIN)
+                            .requestMatchers(GET, "/api/teacher/get-information/").permitAll()
 
                             .requestMatchers(POST, "/api/teachers/**").hasAnyRole(Role.ADMIN)
                             .requestMatchers(PUT, "/api/teachers/**").hasAnyRole(Role.ADMIN)

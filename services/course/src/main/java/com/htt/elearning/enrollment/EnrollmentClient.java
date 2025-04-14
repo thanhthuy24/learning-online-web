@@ -19,7 +19,8 @@ public interface EnrollmentClient {
     @GetMapping("check-enrollment-boolean")
     Boolean checkEnrollment(
             @RequestParam Long userId,
-            @RequestParam Long courseId
+            @RequestParam Long courseId,
+            @RequestHeader("Authorization") String token
     );
 
     @GetMapping("/get-users/{courseId}")

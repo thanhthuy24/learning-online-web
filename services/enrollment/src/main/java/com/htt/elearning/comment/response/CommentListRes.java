@@ -11,6 +11,6 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CommentListRes {
-    private List<Comment> comments;
+    private List<CommentResponse> comments;
     private int totalPages;
 }

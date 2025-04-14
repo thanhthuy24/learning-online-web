@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Certificate of Completion</title>
+
+    <style>
+        /* Thiết lập bố cục và phong cách tổng thể */
+        body {
+            font-family: Georgia, serif;
+            text-align: center;
+            padding: 50px;
+            background: #f7f7f7;
+            /*display: flex;*/
+            /*justify-content: center;*/
+            /*align-items: center;*/
+            height: 600px;
+        }
+
+        /* Khung chứng chỉ */
+        .certificate {
+            width: 500px;
+            height: 750px;
+            background: white;
+            padding: 40px;
+            position: relative;
+            border: 10px solid #003092;
+            /*box-shadow: 10px 10px 20px rgba(0, 0, 0, 0.2);*/
+        }
+
+        /* Hiệu ứng viền bên trong */
+        .certificate::before {
+            content: "";
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            bottom: 10px;
+            border: 5px solid #003092;
+        }
+
+        /* Logo */
+        .logo {
+            position: absolute;
+            top: 30px; /* Đưa logo lên cao hơn */
+            left: 30px;
+            width: 150px; /* Giảm kích thước */
+            height: auto;
+        }
+
+        /* Tiêu đề chứng chỉ */
+        .certificate-title {
+            font-size: 50px;
+            font-weight: bold;
+            margin-top: 80px; /* Đẩy tiêu đề xuống thấp hơn */
+            color: #155E95;
+        }
+
+        .certificate-title-2 {
+            font-size: 30px;
+            font-style: italic;
+            color: #578FCA;
+        }
+
+        /* Phần người nhận */
+        .user-name {
+            font-size: 40px;
+            margin-top: 30px;
+            font-weight: bold;
+            color: #000000;
+            text-transform: uppercase;
+        }
+
+        /* Tên khóa học */
+        .course-name {
+            font-size: 22px;
+            font-weight: bold;
+            margin-top: 10px;
+            color: #444;
+        }
+
+        /* Ngày cấp */
+        .date {
+            margin-top: 20px;
+            font-size: 18px;
+            color: #666;
+        }
+
+        /* Chữ ký */
+        .signature-container {
+            position: relative; /* Thay đổi từ absolute thành relative */
+            margin-top: 20px; /* Đẩy chữ ký xuống để tạo khoảng cách */
+            text-align: center;
+        }
+
+        .signature {
+            width: 150px;
+            height: auto;
+            margin-top: 10px;
+        }
+
+        .signature-name {
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .signature-title {
+            font-size: 14px;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+
+<div class="certificate">
+    <!-- Logo -->
+    <img class="logo" src="https://res.cloudinary.com/dqokcgmfc/image/upload/v1740297002/logo_ilzbky.png" alt="Company Logo"/>
+
+    <!-- Tiêu đề -->
+    <h1 class="certificate-title">CERTIFICATE</h1>
+    <h2 class="certificate-title-2">OF COMPLETION</h2>
+
+    <p>This certificate is proudly presented to</p>
+
+    <!-- Người nhận -->
+    <p class="user-name" th:text="${studentName}">Nguyen Van A</p>
+
+    <hr style="width: 60%; margin: 20px auto; border: 1px solid #555"/>
+
+    <p>For successfully completing the course:</p>
+    <p class="course-name" th:text="${courseName}">Course's Name</p>
+
+    <p>On <span class="date" th:text="${issueDate}">August 20, 2024</span></p>
+
+    <!-- Chữ ký -->
+    <div class="signature-container">
+        <img class="signature" src="https://res.cloudinary.com/dqokcgmfc/image/upload/v1740297253/signature_xgojh3.png" alt="Signature"/>
+        <p class="signature-name">John Doe</p>
+        <p class="signature-title">Director of Education</p>
+    </div>
+
+</div>
+
+</body>
+</html>

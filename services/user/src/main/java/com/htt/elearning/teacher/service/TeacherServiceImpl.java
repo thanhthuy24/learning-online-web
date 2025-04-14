@@ -4,6 +4,7 @@ import com.htt.elearning.teacher.dto.TeacherDTO;
 import com.htt.elearning.teacher.pojo.Teacher;
 import com.htt.elearning.teacher.repository.TeacherRepository;
 import com.htt.elearning.teacher.response.TeacherResponse;
+import com.htt.elearning.teacher.response.TeacherResponseClient;
 import com.htt.elearning.user.pojo.User;
 import com.htt.elearning.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +17,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -117,15 +119,22 @@ public class TeacherServiceImpl implements TeacherService {
 
     @Override
     public Teacher getInformation(Long teacherId){
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        Long userId = userRepository.findByUsername(username).get().getId();
+        Teacher teacher = teacherRepository.findById(teacherId).get();
+        return teacher;
+    }
 
-        Long id = teacherRepository.findById(teacherId).get().getUserId();
+    @Override
+    public List<TeacherResponseClient> getTeacherResponseClient(List<Long> teacherIds){
+        List<Teacher> teachers = teacherRepository.findAllById(teacherIds);
 
-        if (id == userId) {
-            Teacher teacher = teacherRepository.findById(teacherId).get();
-            return teacher;
-        }
-        return null;
+        return teachers.stream()
+                .map(TeacherResponseClient::fromTeacher)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public TeacherResponseClient getOneTeacherResponseClient(Long teacherId){
+        Teacher teacher = teacherRepository.findById(teacherId).get();
+        return TeacherResponseClient.fromTeacher(teacher);
     }
 }

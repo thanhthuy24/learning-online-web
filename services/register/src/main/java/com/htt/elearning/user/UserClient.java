@@ -6,6 +6,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import java.util.List;
 
 @FeignClient(
         name = "user-service",
@@ -35,5 +38,11 @@ public interface UserClient {
     @GetMapping("/update-role-teacher/{userId}")
     UserResponse updateRoleTeacher(
             @PathVariable("userId") Long userId
+    );
+
+    @GetMapping("/get-users-by-ids")
+    List<UserResponse> getUsersByIdsClient(
+            @RequestParam("userIds") List<Long> userIds,
+            @RequestHeader("Authorization") String token
     );
 }

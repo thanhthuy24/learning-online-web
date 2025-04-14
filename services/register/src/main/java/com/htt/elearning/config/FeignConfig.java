@@ -1,4 +1,4 @@
-package com.htt.elearning;
+package com.htt.elearning.config;
 
 import feign.RequestInterceptor;
 import feign.RequestTemplate;

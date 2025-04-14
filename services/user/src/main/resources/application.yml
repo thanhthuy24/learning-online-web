@@ -24,6 +24,6 @@ spring:
 
 jwt:
   expiration: 2592000
-  secretKey: #secretKey
+  secretKey:  #secretKey
 
 

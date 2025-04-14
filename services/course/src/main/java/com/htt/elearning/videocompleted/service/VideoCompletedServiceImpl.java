@@ -38,12 +38,12 @@ public class VideoCompletedServiceImpl implements VideoCompletedService {
 
         Videocompleted checkVideoCompleted = videoCompletedRepository.findByVideoIdAndUserId(videoCompleteDTO.getVideoId(), userId);
         if (checkVideoCompleted != null) {
-            new ResponseStatusException(HttpStatus.NOT_FOUND, "Video already completed!");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Video already completed!");
         }
 
         Boolean checkEnrollment = enrollmentClient.checkEnrollmentPt2(userId, existingVideo.getLesson().getCourse().getId(), token);
         if (checkEnrollment == null || !checkEnrollment) {
-            new ResponseStatusException(HttpStatus.NOT_FOUND,
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
                     "This course isn't enrolled in your list! Please enroll before participating in this course!!");
         }
 
@@ -55,7 +55,7 @@ public class VideoCompletedServiceImpl implements VideoCompletedService {
 
         videoCompletedRepository.save(videocompleted);
 
-        progressClient.createProgress(existingVideo.getLesson().getCourse().getId());
+        progressClient.createProgress(existingVideo.getLesson().getCourse().getId(), token);
 
         return videocompleted;
     }

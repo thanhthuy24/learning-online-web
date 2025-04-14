@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -260,14 +261,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Page<UserResponse> getUsersByRole(Long roleId, String key, Pageable pageable) {
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        Long role = userRepository.getUserByUsername(username).getRoleId();
-        if (role != 2){
-            throw new ResponseStatusException(
-                    HttpStatus.FORBIDDEN, "Authorization!!"
-            );
-        }
-
         Page<User> user = userRepository.findUsersByRoleId(roleId, key, pageable);
         return user.map(this::convertToDTO);
     }
@@ -283,14 +276,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User updateStatus(Long userId) {
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        Long role = userRepository.getUserByUsername(username).getRoleId();
-        if (role != 2){
-            throw new ResponseStatusException(
-                    HttpStatus.FORBIDDEN, "Authorization!!"
-            );
-        }
-
         User getUser = userRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
@@ -330,8 +315,8 @@ public class UserServiceImpl implements UserService {
 
         newUser.setRole(role);
         // kiểm tra nếu có account_id thì không yêu cầu password
-        if(userRegisterAccDTO.getFacebookAccountId().equals('0')
-                && userRegisterAccDTO.getGoogleAccountId().equals('0')){
+        if(userRegisterAccDTO.getFacebookAccountId().equals("0")
+                && userRegisterAccDTO.getGoogleAccountId().equals("0")){
             String password = userRegisterAccDTO.getPassword();
             String encodedPassword = passwordEncoder.encode(password);
             // noi sau trong phan spring security
@@ -368,4 +353,19 @@ public class UserServiceImpl implements UserService {
     public List<Long> searchUserIdsByKeyword(String keyword) {
         return userRepository.searchUserIdsByKeyword(keyword);
     }
+
+    @Override
+    public List<UserResponse> getUsersByIds(List<Long> userIds) {
+        List<User> users = userRepository.findAllById(userIds);
+        return users.stream()
+                .map(user -> UserResponse.fromUser(user)) // hoặc dùng UserResponse.fromEntity(user)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public Page<UserResponse> getUsersTeachers(PageRequest pageRequest, String key) {
+//        Page<User> user = userRepository.find
+        return null;
+    }
+
 }

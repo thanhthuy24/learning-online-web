@@ -3,6 +3,7 @@ package com.htt.elearning.comment.controller;
 import com.htt.elearning.comment.dto.ReplyDTO;
 import com.htt.elearning.comment.pojo.Replycomment;
 import com.htt.elearning.comment.response.ReplyCommentListResponse;
+import com.htt.elearning.comment.response.ReplyCommentResponse;
 import com.htt.elearning.comment.service.ReplyCommentService;
 import com.htt.elearning.exceptions.DataNotFoundException;
 import jakarta.validation.Valid;
@@ -35,11 +36,11 @@ public class ReplyCommentController {
 //        return ResponseEntity.ok(list);
         PageRequest pageRequest = PageRequest.of(page, limit,
                 Sort.by("createdDate").descending());
-        Page<Replycomment> list = replyCommentService.getReplyByCommentId(commentId, pageRequest);
+        Page<ReplyCommentResponse> list = replyCommentService.getReplyByCommentId(commentId, pageRequest);
 
         int totalPages = list.getTotalPages();
 
-        List<Replycomment> replycomments = list.getContent();
+        List<ReplyCommentResponse> replycomments = list.getContent();
         return ResponseEntity.ok(ReplyCommentListResponse.builder()
                 .replycomments(replycomments)
                 .totalPages(totalPages)

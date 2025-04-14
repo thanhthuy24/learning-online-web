@@ -34,8 +34,9 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
-    private final CloudinaryClient cloudinaryService;
+    private final CloudinaryClient cloudinaryClient;
     private final AuthService authService;
+    private final HttpServletRequest request;
 
     @GetMapping("/all-users")
     @ResponseStatus(HttpStatus.OK)
@@ -89,7 +90,6 @@ public class UserController {
     }
 
     @GetMapping(path = "/current-user", produces = MediaType.APPLICATION_JSON_VALUE)
-    @CrossOrigin
     public ResponseEntity<User> details(Principal user) {
         Optional<User> u = this.userService.getUserByUsername(user.getName());
         return u.map(ResponseEntity::ok)
@@ -171,7 +171,8 @@ public class UserController {
 
     private String storeFile(MultipartFile file) {
         try {
-            Map<String, Object> uploadResult = (Map<String, Object>) cloudinaryService.uploadFile(file);
+            String token = request.getHeader("Authorization");
+            Map<String, Object> uploadResult = cloudinaryClient.uploadFileImage(file, token);
             return uploadResult.get("url").toString();
         } catch (Exception e) {
             throw new RuntimeException("Lỗi khi upload file lên Cloudinary", e);
@@ -372,5 +373,12 @@ public class UserController {
             @RequestParam("keyword") String keyword
     ){
         return userService.searchUserIdsByKeyword(keyword);
+    }
+
+    @GetMapping("/get-users-by-ids")
+    public List<UserResponse> getUsersByIdsClient(
+        @RequestParam("userIds") List<Long> userIds
+    ){
+        return userService.getUsersByIds(userIds);
     }
 }

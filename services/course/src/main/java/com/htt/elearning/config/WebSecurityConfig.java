@@ -37,6 +37,10 @@ public class WebSecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/course/**").hasRole("ADMIN")
 
                         .requestMatchers(HttpMethod.GET, "/api/lessons/count-by-course/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/lessons/auth/course/").hasRole("USER, TEACHER")
+
+                        .requestMatchers(POST, "/api/video-completed/").hasRole("USER")
+
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

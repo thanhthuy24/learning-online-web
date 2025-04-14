@@ -43,15 +43,15 @@ public class Replycomment {
         this.createdDate = new Date();
     }
 
-    public static Replycomment fromReplyComment(Replycomment replyComment) {
-        Replycomment reply = Replycomment.builder()
-                .id(replyComment.getId())
-                .comment(replyComment.getComment())
-                .content(replyComment.getContent())
-                .userId(replyComment.getUserId())
-                .build();
-        reply.setCreatedDate(replyComment.getCreatedDate());
-        return reply;
-    }
+//    public static Replycomment fromReplyComment(Replycomment replyComment) {
+//        Replycomment reply = Replycomment.builder()
+//                .id(replyComment.getId())
+//                .comment(replyComment.getComment())
+//                .content(replyComment.getContent())
+//                .userId(replyComment.getUserId())
+//                .build();
+//        reply.setCreatedDate(replyComment.getCreatedDate());
+//        return reply;
+//    }
 
 }

@@ -4,8 +4,11 @@ import com.htt.elearning.category.pojo.Category;
 import com.htt.elearning.category.repository.CategoryRepository;
 import com.htt.elearning.course.response.CourseResponse;
 import com.htt.elearning.course.response.CourseResponseRedis;
+import com.htt.elearning.course.response.TestCourseResponse;
 import com.htt.elearning.teacher.TeacherClient;
+import com.htt.elearning.teacher.TeacherClient2;
 import com.htt.elearning.teacher.response.TeacherResponse;
+import com.htt.elearning.teacher.response.TeacherResponseClient;
 import com.htt.elearning.user.UserClient;
 import com.htt.elearning.course.dto.CourseDTO;
 import com.htt.elearning.course.pojo.Course;
@@ -22,7 +25,9 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -32,6 +37,7 @@ public class CourseServiceImpl implements CourseService {
     private final CourseRepository courseRepository;
     private final TagRepository tagRepository;
     private final TeacherClient teacherClient;
+    private final TeacherClient2 teacherClient2;
     private final UserClient userClient;
     private final ModelMapper modelMapper;
     private final HttpServletRequest request;
@@ -68,10 +74,14 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public Course getCourseById(Long id) {
-        return courseRepository.findById(id)
+    public TestCourseResponse getCourseById(Long id) {
+        Course course = courseRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND, "Can not find course with id : " + id));
+
+        TeacherResponseClient teacher = teacherClient2.getInformationOneTeacher(course.getTeacherId());
+
+        return TestCourseResponse.fromCourse(course, teacher);
     }
 
     public List<Course> searchCourses(String keyword) {
@@ -123,10 +133,6 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public Page<Course> getCoursesByTeacherId(Long teacherId, Pageable pageable) {
-//        return null;
-//        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-//        String username = userClient.getUsername();
-//        Long userId = userRepository.getUserByUsername(username).getId();
         String token = request.getHeader("Authorization");
         Long userId = userClient.getUserIdByUsernameClient(token);
 
@@ -137,8 +143,46 @@ public class CourseServiceImpl implements CourseService {
         if (existingTeacher.getUserId() != userId) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Forbidden");
         }
-        return courseRepository.findByTeacherId(teacherId, pageable);
 
+        return courseRepository.findByTeacherId(teacherId, pageable);
+    }
+
+    @Override
+    public Page<TestCourseResponse> getTestCoursesByTeacherId(Long teacherId, Pageable pageable) {
+        String token = request.getHeader("Authorization");
+        Long userId = userClient.getUserIdByUsernameClient(token);
+
+        TeacherResponse existingTeacher = Optional.ofNullable(teacherClient.getTeacherById(teacherId, token))
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Can not find teacher with id: " + teacherId));
+
+        if (existingTeacher.getUserId() != userId) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Forbidden");
+        }
+        Page<Course> coursesPage = courseRepository.findByTeacherId(teacherId, pageable);
+        List<Course> courses = coursesPage.getContent();
+
+        // 2. Lấy danh sách teacherIds
+        List<Long> teacherIds = courses.stream()
+                .map(Course::getTeacherId)
+                .distinct()
+                .collect(Collectors.toList());
+
+        // 3. Gọi sang TeacherService để lấy thông tin teacher
+        List<TeacherResponseClient> teachers = teacherClient2.getInformationTeacher(teacherIds);
+        Map<Long, TeacherResponseClient> teacherMap = teachers.stream()
+                .collect(Collectors.toMap(TeacherResponseClient::getId, Function.identity()));
+
+        // 4. Map Course -> TestCourseResponse
+        List<TestCourseResponse> courseResponses = courses.stream()
+                .map(course -> {
+                    TeacherResponseClient teacher = teacherMap.get(course.getTeacherId());
+                    return TestCourseResponse.fromCourse(course, teacher);
+                })
+                .collect(Collectors.toList());
+
+        // 5. Trả về Page<TestCourseResponse>
+        return new PageImpl<>(courseResponses, pageable, coursesPage.getTotalElements());
     }
 
     @Override
@@ -198,7 +242,87 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public Page<CourseResponseRedis> getAllCoursesRedisClient(Pageable pageable, String keyword, Long categoryId) {
-        Page<Course> courses = courseRepository.searchCoursesRedis(categoryId, keyword, pageable);
-        return courses.map(CourseResponseRedis::fromCourse);
+        Page<Course> coursePage = courseRepository.searchCoursesRedis(categoryId, keyword, pageable);
+        List<Course> courses = coursePage.getContent();
+
+        // 2. Lấy danh sách teacherIds
+        List<Long> teacherIds = courses.stream()
+                .map(Course::getTeacherId)
+                .distinct()
+                .collect(Collectors.toList());
+
+        // 3. Gọi sang TeacherService để lấy thông tin teacher
+        List<TeacherResponseClient> teachers = teacherClient2.getInformationTeacher(teacherIds);
+        Map<Long, TeacherResponseClient> teacherMap = teachers.stream()
+                .collect(Collectors.toMap(TeacherResponseClient::getId, Function.identity()));
+
+
+        List<CourseResponseRedis> courseResponseRedis = courses.stream()
+                .map(course -> {
+                    TeacherResponseClient teacher = teacherMap.get(course.getTeacherId());
+                    return CourseResponseRedis.fromCourse(course, teacher);
+                })
+                .collect(Collectors.toList());
+
+        // 5. Trả về Page<TestCourseResponse>
+        return new PageImpl<>(courseResponseRedis, pageable, coursePage.getTotalElements());
+    }
+
+    @Override
+    public Page<TestCourseResponse> testCourses(Pageable pageable) {    // 1. Phân trang Course
+        Page<Course> coursePage = courseRepository.findAll(pageable);
+        List<Course> courses = coursePage.getContent();
+
+        // 2. Lấy danh sách teacherIds
+        List<Long> teacherIds = courses.stream()
+                .map(Course::getTeacherId)
+                .distinct()
+                .collect(Collectors.toList());
+
+        // 3. Gọi sang TeacherService để lấy thông tin teacher
+        List<TeacherResponseClient> teachers = teacherClient2.getInformationTeacher(teacherIds);
+        Map<Long, TeacherResponseClient> teacherMap = teachers.stream()
+                .collect(Collectors.toMap(TeacherResponseClient::getId, Function.identity()));
+
+        // 4. Map Course -> TestCourseResponse
+        List<TestCourseResponse> courseResponses = courses.stream()
+                .map(course -> {
+                    TeacherResponseClient teacher = teacherMap.get(course.getTeacherId());
+                    return TestCourseResponse.fromCourse(course, teacher);
+                })
+                .collect(Collectors.toList());
+
+        // 5. Trả về Page<TestCourseResponse>
+        return new PageImpl<>(courseResponses, pageable, coursePage.getTotalElements());
+    }
+
+    @Override
+    public TestCourseResponse getTestCourseResponseByCourseId(Long courseId){
+        Course course = courseRepository.getCourseById(courseId);
+        TeacherResponseClient teacherResponseClient = teacherClient2.getInformationOneTeacher(course.getTeacherId());
+        return TestCourseResponse.fromCourse(course, teacherResponseClient);
+    }
+
+    @Override
+    public List<TestCourseResponse> getTestCourseResponseByCourseIds(List<Long> courseIds) {
+        List<Course> courses = courseRepository.findAllById(courseIds);
+        List<Long> teacherIds = courses.stream()
+                .map(Course::getTeacherId)
+                .distinct()
+                .collect(Collectors.toList());
+
+        // 3. Gọi sang TeacherService để lấy thông tin teacher
+        List<TeacherResponseClient> teachers = teacherClient2.getInformationTeacher(teacherIds);
+        Map<Long, TeacherResponseClient> teacherMap = teachers.stream()
+                .collect(Collectors.toMap(TeacherResponseClient::getId, Function.identity()));
+
+        // 4. Map Course -> TestCourseResponse
+        List<TestCourseResponse> courseResponses = courses.stream()
+                .map(course -> {
+                    TeacherResponseClient teacher = teacherMap.get(course.getTeacherId());
+                    return TestCourseResponse.fromCourse(course, teacher);
+                })
+                .collect(Collectors.toList());
+        return courseResponses;
     }
 }

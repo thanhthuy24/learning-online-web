@@ -3,6 +3,7 @@ package com.htt.elearning.register.service;
 import com.htt.elearning.register.dto.RegisterDTO;
 import com.htt.elearning.register.pojo.Register;
 import com.htt.elearning.register.repository.RegisterRepository;
+import com.htt.elearning.register.response.RegisterResponse;
 import com.htt.elearning.user.UserClient;
 import com.htt.elearning.user.response.UserResponse;
 import jakarta.servlet.http.HttpServletRequest;
@@ -12,6 +13,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -21,11 +25,28 @@ public class RegisterServiceImpl implements RegisterService{
     private final HttpServletRequest request;
 
     @Override
-    public List<Register> getAllRegisters() {
-        List<Register> list = registerRepository.findAll();
-        if (list.isEmpty())
+    public List<RegisterResponse> getAllRegisters() {
+        String token = request.getHeader("Authorization");
+
+        List<Register> registers = registerRepository.findAll();
+        if (registers.isEmpty())
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Không có đơn cần phê duyệt");
-        return list;
+        List<Long> userIds = registers.stream()
+                .map(Register::getUserId)
+                .distinct()
+                .collect(Collectors.toList());
+
+        List<UserResponse> users = userClient.getUsersByIdsClient(userIds, token);
+        Map<Long, UserResponse> usersMap = users.stream()
+                .collect(Collectors.toMap(UserResponse::getId, Function.identity()));
+
+        List<RegisterResponse> registerResponses = registers.stream()
+                .map(register -> {
+                    UserResponse user = usersMap.get(register.getUserId());
+                    return RegisterResponse.fromRegister(register, user);
+                })
+                .collect(Collectors.toList());
+        return registerResponses;
     }
 
     @Override
@@ -45,13 +66,16 @@ public class RegisterServiceImpl implements RegisterService{
     }
 
     @Override
-    public List<Register> getListFormByUserId() {
+    public List<RegisterResponse> getListFormByUserId() {
         String token = request.getHeader("Authorization");
         Long userId = userClient.getUserIdByUsername(token);
 
-        List<Register> list = registerRepository.findRegisterByUserId(userId);
+        List<Register> registers = registerRepository.findRegisterByUserId(userId);
+        UserResponse user = userClient.getUserByIdClient(userId, token);
 
-        return list;
+        return registers.stream()
+                .map(register -> RegisterResponse.fromRegister(register, user))
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -75,10 +99,14 @@ public class RegisterServiceImpl implements RegisterService{
     }
 
     @Override
-    public Register getRegisterById(Long registerId) {
-        return registerRepository.findById(registerId)
+    public RegisterResponse getRegisterById(Long registerId) {
+        String token = request.getHeader("Authorization");
+        Register register = registerRepository.findById(registerId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "Không tìm thấy ID như trên!!"));
+
+        UserResponse user = userClient.getUserByIdClient(register.getUserId(), token);
+        return RegisterResponse.fromRegister(register, user);
     }
 
     @Override
@@ -102,16 +130,10 @@ public class RegisterServiceImpl implements RegisterService{
         Register existingRegister = registerRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Not found"));
         if (existingRegister != null) {
-            UserResponse user = userClient.getUserByIdClient(registerDTO.getUserId(), token);
-
-            if (user != null) {
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
-            }
-
             existingRegister.setPosition(registerDTO.getPosition());
             existingRegister.setStatus(true);
             existingRegister.setReason(registerDTO.getReason());
-            existingRegister.setUserId(user.getId());
+            existingRegister.setUserId(registerDTO.getUserId());
 
 //            userClient.updateRoleTeacher(user.getId());
 //

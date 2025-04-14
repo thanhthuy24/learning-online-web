@@ -3,6 +3,7 @@ package com.htt.elearning.comment.controller;
 import com.htt.elearning.comment.dto.CommentDTO;
 import com.htt.elearning.comment.pojo.Comment;
 import com.htt.elearning.comment.response.CommentListRes;
+import com.htt.elearning.comment.response.CommentResponse;
 import com.htt.elearning.comment.service.CommentService;
 import com.htt.elearning.exceptions.DataNotFoundException;
 import jakarta.validation.Valid;
@@ -68,11 +69,11 @@ public class CommentController {
     ) throws DataNotFoundException {
         PageRequest pageRequest = PageRequest.of(page, limit,
                 Sort.by("createdDate").descending());
-        Page<Comment> list = commentService.getComments(lessonId, pageRequest);
+        Page<CommentResponse> list = commentService.getComments(lessonId, pageRequest);
 
         int totalPages = list.getTotalPages();
 
-        List<Comment> cmts = list.getContent();
+        List<CommentResponse> cmts = list.getContent();
         return ResponseEntity.ok(CommentListRes.builder()
                 .comments(cmts)
                 .totalPages(totalPages)

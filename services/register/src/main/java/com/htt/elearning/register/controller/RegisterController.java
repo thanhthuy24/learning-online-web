@@ -2,6 +2,7 @@ package com.htt.elearning.register.controller;
 
 import com.htt.elearning.register.dto.RegisterDTO;
 import com.htt.elearning.register.pojo.Register;
+import com.htt.elearning.register.response.RegisterResponse;
 import com.htt.elearning.register.service.RegisterService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -23,17 +24,16 @@ public class RegisterController {
     @GetMapping("")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<?> getAllRegister() {
-        List<Register> list = registerService.getAllRegisters();
+        List<RegisterResponse> list = registerService.getAllRegisters();
         return ResponseEntity.ok(list);
     }
 
     @GetMapping("/{registerId}")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<Register> getRegisterById(
+    public ResponseEntity<RegisterResponse> getRegisterById(
             @PathVariable Long registerId
     ) {
-        Register registerById = registerService.getRegisterById(registerId);
-        return ResponseEntity.ok(registerById);
+        return ResponseEntity.ok(registerService.getRegisterById(registerId));
     }
 
     @PostMapping("")

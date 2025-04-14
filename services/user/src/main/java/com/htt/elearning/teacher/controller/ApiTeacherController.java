@@ -4,6 +4,7 @@ import com.htt.elearning.teacher.dto.TeacherDTO;
 import com.htt.elearning.teacher.pojo.Teacher;
 import com.htt.elearning.teacher.response.TeacherListResponse;
 import com.htt.elearning.teacher.response.TeacherResponse;
+import com.htt.elearning.teacher.response.TeacherResponseClient;
 import com.htt.elearning.teacher.service.TeacherService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -119,5 +120,14 @@ public class ApiTeacherController {
 
     ){
         return teacherService.getTeacherByUserIdClient(userId);
+    }
+
+    @GetMapping("/get-infor-teacher/{teacherId}")
+    @ResponseStatus(HttpStatus.OK)
+    public TeacherResponseClient getInforTeacherByTeacherId(
+            @PathVariable Long teacherId
+    ){
+//        return teacherService.getTeacherResponseClient(teacherId);
+        return null;
     }
 }

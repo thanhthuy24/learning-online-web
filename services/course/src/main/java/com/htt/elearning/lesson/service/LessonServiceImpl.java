@@ -155,7 +155,7 @@ public class LessonServiceImpl implements LessonService {
         Long userId = userClient.getUserIdByUsernameClient(token);
         Long role = userClient.getRoleIdClient(token);
         if(role == 1) {
-            Boolean check = enrollmentClient.checkEnrollment(userId, courseId);
+            Boolean check = enrollmentClient.checkEnrollment(userId, courseId, token);
             if (check == null || !check) {
                 throw new ResponseStatusException(
                         HttpStatus.FORBIDDEN, "You must enroll this course first!!"

@@ -4,6 +4,7 @@ import com.htt.elearning.enrollment.dtos.EnrollmentDTO;
 import com.htt.elearning.enrollment.pojo.Enrollment;
 import com.htt.elearning.enrollment.repository.EnrollmentRepository;
 import com.htt.elearning.enrollment.response.EnrollmentResponse;
+import com.htt.elearning.enrollment.response.EnrollmentResponseClient;
 import com.htt.elearning.enrollment.service.EnrollmentService;
 import com.htt.elearning.user.response.UserResponse;
 import lombok.RequiredArgsConstructor;
@@ -64,18 +65,18 @@ public class ApiEnrollmentController {
 
     @GetMapping("/get-courses")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<List<Enrollment>> getEnrollments(
+    public ResponseEntity<List<EnrollmentResponseClient>> getEnrollments(
     ){
-        List<Enrollment> enrollments = enrollmentService.getEnrollmentByUser();
+        List<EnrollmentResponseClient> enrollments = enrollmentService.getEnrollmentByUser();
         return ResponseEntity.ok(enrollments);
     }
 
     @GetMapping("/get-courses/{userId}")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<List<Enrollment>> getEnrollments(
+    public ResponseEntity<List<EnrollmentResponseClient>> getEnrollments(
             @PathVariable Long userId
     ){
-        List<Enrollment> enrollments = enrollmentService.getCousesEnrolledByUser(userId);
+        List<EnrollmentResponseClient> enrollments = enrollmentService.getCousesEnrolledByUser(userId);
         return ResponseEntity.ok(enrollments);
     }
 

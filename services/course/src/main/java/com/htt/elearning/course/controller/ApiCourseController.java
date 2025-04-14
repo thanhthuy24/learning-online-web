@@ -4,10 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.htt.elearning.cloudinary.CloudinaryClient;
 import com.htt.elearning.course.dto.CourseDTO;
 import com.htt.elearning.course.pojo.Course;
-import com.htt.elearning.course.response.CourseListResponse;
-import com.htt.elearning.course.response.CourseResponse;
-import com.htt.elearning.course.response.CourseResponseRedis;
-import com.htt.elearning.course.response.CourseResponseRedisList;
+import com.htt.elearning.course.response.*;
 import com.htt.elearning.course.service.CourseRedisService;
 import com.htt.elearning.course.service.CourseService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -110,11 +107,10 @@ public class ApiCourseController {
 
     @GetMapping("/{courseId}")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<Course> getCourseById(
+    public ResponseEntity<TestCourseResponse> getCourseById(
             @PathVariable("courseId") Long courseId
     ) {
-        Course courseById = courseService.getCourseById(courseId);
-        return ResponseEntity.ok(courseById);
+        return ResponseEntity.ok(courseService.getCourseById(courseId));
     }
 
     @GetMapping("/teacher/{teacherId}")
@@ -125,9 +121,9 @@ public class ApiCourseController {
             @RequestParam("limit") int limit
     ) {
 //        return ResponseEntity.ok(courseService.getCoursesByTeacherId(teacherId));
-        Pageable pageRequest = PageRequest.of(page, limit,
+        Pageable pageable = PageRequest.of(page, limit,
                 Sort.by("createdDate").descending());
-        Page<Course> coursePage = courseService.getCoursesByTeacherId(teacherId, pageRequest);
+        Page<Course> coursePage = courseService.getCoursesByTeacherId(teacherId, pageable);
         int totalPage = coursePage.getTotalPages();
         List<Course> courses = coursePage.getContent();
         return ResponseEntity.ok(CourseListResponse.builder()
@@ -207,6 +203,24 @@ public class ApiCourseController {
         return ResponseEntity.ok("delete course");
     }
 
+    @GetMapping("/course-teacher/{teacherId}")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<?> getCoursesByTeacher(
+            @PathVariable("teacherId") Long teacherId,
+            @RequestParam("page") int page,
+            @RequestParam("limit") int limit
+    ){
+        PageRequest pageRequest = PageRequest.of(page, limit,
+                Sort.by("createdDate").descending());
+        Page<TestCourseResponse> coursePage = courseService.getTestCoursesByTeacherId(teacherId, pageRequest);
+        int totalPage = coursePage.getTotalPages();
+        List<TestCourseResponse> courses = coursePage.getContent();
+        return ResponseEntity.ok(TestList.builder()
+                .courses(courses)
+                .totalPages(totalPage)
+                .build());
+    }
+
 //    course - client
     @GetMapping("/get-courseId/{courseId}")
     public CourseResponse getCourseByIdClient(
@@ -265,4 +279,38 @@ public class ApiCourseController {
                 .build();
         return ResponseEntity.ok(courseResponseRedisList);
     }
+
+    @GetMapping("/test-courses")
+    public ResponseEntity<TestList> testCourses(
+            @RequestParam("page") int page,
+            @RequestParam("limit") int limit
+    ){
+        Pageable pageRequest = PageRequest.of(page, limit,
+                Sort.by("createdDate").descending());
+        Page<TestCourseResponse> coursePage = courseService.testCourses(pageRequest);
+
+        // lay tong so trang
+        int totalPage = coursePage.getTotalPages();
+        List<TestCourseResponse> courses = coursePage.getContent();
+        return ResponseEntity.ok(TestList.builder()
+                .courses(courses)
+                .totalPages(totalPage)
+                .build());
+    }
+
+    @GetMapping("/get-course-by-id")
+    public TestCourseResponse getFullCourseResponse(
+            @PathVariable Long courseId
+    ){
+        TestCourseResponse testCourseResponse = courseService.getTestCourseResponseByCourseId(courseId);
+        return testCourseResponse;
+    }
+
+    @GetMapping("/get-course-by-ids")
+    public List<TestCourseResponse> getFullCourseResponses(
+            @RequestParam List<Long> courseIds
+    ){
+        return courseService.getTestCourseResponseByCourseIds(courseIds);
+    }
+
 }

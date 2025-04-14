@@ -10,10 +10,10 @@ import java.util.Date;
 
 @Getter
 @Setter
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
-public class CourseResponseRedis {
+public class TestCourseResponse {
     private Long id;
     private String name;
     private String description;
@@ -27,10 +27,8 @@ public class CourseResponseRedis {
     private Tag tag;
     private TeacherResponseClient teacher;
 
-    private int totalPages;
-
-    public static CourseResponseRedis fromCourse(Course course, TeacherResponseClient teacherResponseClient) {
-        CourseResponseRedis courseResponse = CourseResponseRedis.builder()
+    public static TestCourseResponse fromCourse(Course course, TeacherResponseClient teacherResponseClient) {
+        TestCourseResponse courseResponse = TestCourseResponse.builder()
                 .id(course.getId())
                 .name(course.getName())
                 .price(course.getPrice())

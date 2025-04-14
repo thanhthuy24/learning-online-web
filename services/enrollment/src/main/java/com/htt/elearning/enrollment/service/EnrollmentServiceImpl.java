@@ -2,10 +2,14 @@ package com.htt.elearning.enrollment.service;
 
 import com.htt.elearning.course.CourseClient;
 import com.htt.elearning.course.response.CourseResponse;
+import com.htt.elearning.course.response.CourseResponseClient;
+import com.htt.elearning.course.response.TestCourseResponse;
 import com.htt.elearning.enrollment.dtos.EnrollmentDTO;
 import com.htt.elearning.enrollment.pojo.Enrollment;
 import com.htt.elearning.enrollment.repository.EnrollmentRepository;
+import com.htt.elearning.enrollment.response.EnrollmentResponseClient;
 import com.htt.elearning.progress.service.ProgressService;
+import com.htt.elearning.teacher.response.TeacherResponseClient;
 import com.htt.elearning.user.UserClient;
 import com.htt.elearning.user.response.UserResponse;
 import jakarta.servlet.http.HttpServletRequest;
@@ -16,7 +20,10 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -42,23 +49,53 @@ public class EnrollmentServiceImpl implements EnrollmentService {
     }
 
     @Override
-    public List<Enrollment> getEnrollmentByUser() {
+    public List<EnrollmentResponseClient> getEnrollmentByUser() {
         String token = request.getHeader("Authorization");
         Long userId = userClient.getUserIdByUsername(token);
+
+        UserResponse currentUser = userClient.getUserByIdClient(userId, token);
+
         List<Enrollment> enrollments = enrollmentRepository.findByUserId(userId);
-        return enrollments;
+
+        List<Long> courseIds = enrollments.stream()
+                .map(Enrollment::getCourseId)
+                .distinct()
+                .collect(Collectors.toList());
+
+        List<TestCourseResponse> courses = courseClient.getFullCourseResponses(courseIds);
+        Map<Long, TestCourseResponse> coursesMap = courses.stream()
+                .collect(Collectors.toMap(TestCourseResponse::getId, Function.identity()));
+
+        List<EnrollmentResponseClient> enrollmentResponse = enrollments.stream()
+                .map(enrollment -> {
+                    TestCourseResponse course = coursesMap.get(enrollment.getCourseId());
+                    return EnrollmentResponseClient.fromEnrollment(enrollment, course, currentUser);
+                })
+                .collect(Collectors.toList());
+        return enrollmentResponse;
     }
 
     @Override
-    public List<Enrollment> getCousesEnrolledByUser(Long userId) {
+    public List<EnrollmentResponseClient> getCousesEnrolledByUser(Long userId) {
         String token = request.getHeader("Authorization");
-        Long role = userClient.getRoleIdClient(token);
-        if (role != 2){
-            throw new ResponseStatusException(
-                    HttpStatus.FORBIDDEN, "Authorization!!"
-            );
-        }
-        return enrollmentRepository.findByUserId(userId);
+        UserResponse currentUser = userClient.getUserByIdClient(userId, token);
+        List<Enrollment> enrollments = enrollmentRepository.findByUserId(userId);
+        List<Long> courseIds = enrollments.stream()
+                .map(Enrollment::getCourseId)
+                .distinct()
+                .collect(Collectors.toList());
+
+        List<TestCourseResponse> courses = courseClient.getFullCourseResponses(courseIds);
+        Map<Long, TestCourseResponse> coursesMap = courses.stream()
+                .collect(Collectors.toMap(TestCourseResponse::getId, Function.identity()));
+
+        List<EnrollmentResponseClient> enrollmentResponse = enrollments.stream()
+                .map(enrollment -> {
+                    TestCourseResponse course = coursesMap.get(enrollment.getCourseId());
+                    return EnrollmentResponseClient.fromEnrollment(enrollment, course, currentUser);
+                })
+                .collect(Collectors.toList());
+        return enrollmentResponse;
     }
 
     @Override

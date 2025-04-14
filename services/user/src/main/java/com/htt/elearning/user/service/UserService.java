@@ -38,4 +38,8 @@ public interface UserService {
     UserResponse getUserByUserIdClient(Long userId);
     UserResponse updateRole(Long userId);
     List<Long> searchUserIdsByKeyword(String keyword);
+
+    List<UserResponse> getUsersByIds(List<Long> userIds);
+
+    Page<UserResponse> getUsersTeachers(PageRequest pageRequest, String key);
 }

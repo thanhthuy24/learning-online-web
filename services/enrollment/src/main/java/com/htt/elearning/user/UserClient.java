@@ -4,13 +4,13 @@ import com.htt.elearning.user.response.UserResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @FeignClient(
         name = "user-service",
+        contextId = "userServiceV1",
         url = "${application.config.user-url}"
 )
 public interface UserClient {
@@ -29,6 +29,12 @@ public interface UserClient {
     @GetMapping("/get-user/{userId}")
     UserResponse getUserByIdClient(
             @PathVariable("userId") Long userId,
+            @RequestHeader("Authorization") String token
+    );
+
+    @GetMapping("/get-users-by-ids")
+    List<UserResponse> getUsersByIdsClient(
+            @RequestParam("userIds") List<Long> userIds,
             @RequestHeader("Authorization") String token
     );
 }

@@ -15,6 +15,7 @@ secure:
     - /api/courses/**
     - /api/teachers/users/
     - /api/teachers/get-teacher-by-userId/**
+    - /api/teacher/**
     - /api/lessons/get-first-lesson/course/**
     - /api/lessons/count-by-course/**
     - /api/videos/count/**
