@@ -62,7 +62,7 @@ public class NotificationServiceImpl implements NotificationService {
                 .build();
 
         notificationRepository.save(newNotification);
-
+//        this.sendNotificationToEnrolledUsers();
         return modelMapper.map(newNotification, NotificationResponse.class);
     }
 

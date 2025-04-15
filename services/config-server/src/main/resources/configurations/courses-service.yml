@@ -35,3 +35,4 @@ application:
     enrollment-url: http://localhost:8096/api/enrollments
     progress-url: http://localhost:8096/api/progress
     notification-url: http://localhost:8096/api/get-notification
+    firebase-url: http://localhost:8096/api/notifications

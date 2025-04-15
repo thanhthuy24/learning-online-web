@@ -4,6 +4,7 @@ import com.htt.elearning.enrollment.EnrollmentClient;
 import com.htt.elearning.kafka.LessonCreateEvent;
 import com.htt.elearning.kafka.LessonProducer;
 import com.htt.elearning.lesson.response.LessonResponse;
+import com.htt.elearning.notification.FirebaseClient;
 import com.htt.elearning.notification.NotificationClient;
 import com.htt.elearning.notification.dto.NotificationDTO;
 import com.htt.elearning.notification.response.NotificationResponse;
@@ -45,6 +46,7 @@ public class LessonServiceImpl implements LessonService {
     private final UserClient userClient;
     private final EnrollmentClient enrollmentClient;
     private final TeacherClient teacherClient;
+    private final FirebaseClient firebaseClient;
     private final ModelMapper modelMapper;
     private final NotificationClient notificationClient;
     private final HttpServletRequest request;
@@ -78,6 +80,17 @@ public class LessonServiceImpl implements LessonService {
                 .build();
 
         lessonProducer.sendLessonCreateEvent(event, token);
+        users.forEach(user -> {
+            try {
+                firebaseClient.sendNotification(
+                        lessonDTO.getCourseId(),
+                        "Khoá học " + existCourse.getName() + " bạn đang ký vừa có bài học mới!",
+                        "Bài học mới: " + lessonDTO.getName() + ", hãy check ngay nào, " + user.getUsername() + " ơi!",
+                        token);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
         return newLesson;
     }
 

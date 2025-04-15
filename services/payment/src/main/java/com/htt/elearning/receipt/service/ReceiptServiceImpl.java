@@ -96,7 +96,7 @@ public class ReceiptServiceImpl implements ReceiptService {
                 Long count = 0L;
 
                 Boolean enrollment = enrollmentClient.checkEnrollment(userId, courseId, token);
-                if (!enrollment) {
+                if (enrollment == true) {
                     count++;
                 }
                 if (count > 0L) {

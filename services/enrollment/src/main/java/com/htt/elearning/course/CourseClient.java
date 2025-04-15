@@ -26,4 +26,9 @@ public interface CourseClient {
     List<TestCourseResponse> getFullCourseResponses(
             @RequestParam List<Long> courseIds
     );
+
+    @GetMapping("/get-course-by-id/{courseId}")
+    TestCourseResponse getFullCourseResponse(
+            @PathVariable Long courseId
+    );
 }

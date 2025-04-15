@@ -1,7 +1,9 @@
 package com.htt.elearning.rating.service;
 
+import com.htt.elearning.comment.response.CommentResponse;
 import com.htt.elearning.course.CourseClient;
 import com.htt.elearning.course.response.CourseResponse;
+import com.htt.elearning.course.response.TestCourseResponse;
 import com.htt.elearning.enrollment.pojo.Enrollment;
 import com.htt.elearning.enrollment.repository.EnrollmentRepository;
 import com.htt.elearning.exceptions.DataNotFoundException;
@@ -10,12 +12,15 @@ import com.htt.elearning.progress.repository.ProgressRepository;
 import com.htt.elearning.rating.dto.CourseRatingDTO;
 import com.htt.elearning.rating.pojo.Courserating;
 import com.htt.elearning.rating.repository.CourseRatingRepository;
+import com.htt.elearning.rating.response.RatingResponse;
 import com.htt.elearning.sentiment.SentimentService;
 import com.htt.elearning.user.UserClient;
+import com.htt.elearning.user.response.UserResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.checkerframework.checker.units.qual.C;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -23,7 +28,10 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -83,16 +91,38 @@ public class CourseRatingServiceImpl implements CourseRatingService {
     }
 
     @Override
-    public Page<Courserating> getRatingByCourseId(Long courseId, PageRequest pageRequest) throws DataNotFoundException {
+    public Page<RatingResponse> getRatingByCourseId(Long courseId, PageRequest pageRequest) throws DataNotFoundException {
         String token = request.getHeader("Authorization");
-        CourseResponse existingCourse = courseClient.getCourseByIdClient(courseId, token);
-        if (existingCourse == null) {
-            new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, "Course not found!!");
-        };
+        Page<Courserating> courseratingPage = courseRatingRepository.findByCourseId(courseId, pageRequest);
+        List<Courserating> courseratings = courseRatingRepository.findByCourseId(courseId);
 
-        return courseRatingRepository.findByCourseId(courseId, pageRequest)
-                .map(Courserating::fromRating);
+        TestCourseResponse course = courseClient.getFullCourseResponse(courseId);
+
+        List<Long> userIds = courseratings.stream()
+                .map(Courserating::getUserId)
+                .distinct()
+                .collect(Collectors.toList());
+
+        List<UserResponse> users = userClient.getUsersByIdsClient(userIds, token);
+        Map<Long, UserResponse> usersMap = users.stream()
+                .collect(Collectors.toMap(UserResponse::getId, Function.identity()));
+
+        List<RatingResponse> ratingResponses = courseratings.stream()
+                .map(courserating -> {
+                    UserResponse user = usersMap.get(courserating.getUserId());
+                    return RatingResponse.fromRating(courserating, user, course);
+                })
+                .collect(Collectors.toList());
+        return new PageImpl<>(ratingResponses, pageRequest, courseratingPage.getTotalElements());
+
+//        CourseResponse existingCourse = courseClient.getCourseByIdClient(courseId, token);
+//        if (existingCourse == null) {
+//            new ResponseStatusException(
+//                    HttpStatus.NOT_FOUND, "Course not found!!");
+//        };
+//
+//        return courseRatingRepository.findByCourseId(courseId, pageRequest)
+//                .map(Courserating::fromRating);
     }
 
     @Override
@@ -188,12 +218,55 @@ public class CourseRatingServiceImpl implements CourseRatingService {
     }
 
     @Override
-    public Page<Courserating> getRatingsBySentiment(Long courseId, String sentiment, PageRequest pageRequest) {
-        return courseRatingRepository.findByKeyword(courseId, sentiment, pageRequest);
+    public Page<RatingResponse> getRatingsBySentiment(Long courseId, String sentiment, PageRequest pageRequest) {
+//        return courseRatingRepository.findByKeyword(courseId, sentiment, pageRequest);
+        String token = request.getHeader("Authorization");
+        Page<Courserating> courseratingPage = courseRatingRepository.findByKeyword(courseId, sentiment, pageRequest);
+        List<Courserating> courseratings = courseratingPage.getContent();
+
+        TestCourseResponse course = courseClient.getFullCourseResponse(courseId);
+
+        List<Long> userIds = courseratings.stream()
+                .map(Courserating::getUserId)
+                .distinct()
+                .collect(Collectors.toList());
+
+        List<UserResponse> users = userClient.getUsersByIdsClient(userIds, token);
+        Map<Long, UserResponse> usersMap = users.stream()
+                .collect(Collectors.toMap(UserResponse::getId, Function.identity()));
+
+        List<RatingResponse> ratingResponses = courseratings.stream()
+                .map(courserating -> {
+                    UserResponse user = usersMap.get(courserating.getUserId());
+                    return RatingResponse.fromRating(courserating, user, course);
+                })
+                .collect(Collectors.toList());
+        return new PageImpl<>(ratingResponses, pageRequest, courseratingPage.getTotalElements());
     }
 
     @Override
-    public Page<Courserating> getRatingsByRate(Long courseId, Long rate, PageRequest pageRequest) {
-        return courseRatingRepository.findByRating(courseId, rate, pageRequest);
+    public Page<RatingResponse> getRatingsByRate(Long courseId, Long rate, PageRequest pageRequest) {
+        String token = request.getHeader("Authorization");
+        Page<Courserating> courseratingPage = courseRatingRepository.findByRating(courseId, rate, pageRequest);
+        List<Courserating> courseratings = courseratingPage.getContent();
+
+        TestCourseResponse course = courseClient.getFullCourseResponse(courseId);
+
+        List<Long> userIds = courseratings.stream()
+                .map(Courserating::getUserId)
+                .distinct()
+                .collect(Collectors.toList());
+
+        List<UserResponse> users = userClient.getUsersByIdsClient(userIds, token);
+        Map<Long, UserResponse> usersMap = users.stream()
+                .collect(Collectors.toMap(UserResponse::getId, Function.identity()));
+
+        List<RatingResponse> ratingResponses = courseratings.stream()
+                .map(courserating -> {
+                    UserResponse user = usersMap.get(courserating.getUserId());
+                    return RatingResponse.fromRating(courserating, user, course);
+                })
+                .collect(Collectors.toList());
+        return new PageImpl<>(ratingResponses, pageRequest, courseratingPage.getTotalElements());
     }
 }

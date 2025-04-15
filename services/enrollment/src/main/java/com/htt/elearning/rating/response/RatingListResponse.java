@@ -14,6 +14,6 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RatingListResponse {
-    private List<Courserating> ratings;
+    private List<RatingResponse> ratings;
     private int totalPages;
 }

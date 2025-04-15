@@ -22,7 +22,7 @@ public class EnrollmentResponse {
                 .courseId(enrollment.getCourseId())
                 .userId(enrollment.getUserId())
                 .build();
-        enrollmentResponse.setEnrollmentDate(new Date());
+        enrollmentResponse.setEnrollmentDate(enrollment.getEnrollmentDate());
         return enrollmentResponse;
     }
 }

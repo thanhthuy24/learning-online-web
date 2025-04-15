@@ -4,6 +4,7 @@ import com.htt.elearning.exceptions.DataNotFoundException;
 import com.htt.elearning.rating.dto.CourseRatingDTO;
 import com.htt.elearning.rating.pojo.Courserating;
 import com.htt.elearning.rating.response.RatingListResponse;
+import com.htt.elearning.rating.response.RatingResponse;
 import com.htt.elearning.rating.service.CourseRatingService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -53,11 +54,11 @@ public class CourseRatingController {
         PageRequest pageRequest = PageRequest.of(page, limit,
                 Sort.by("ratingDate").descending());
 
-        Page<Courserating> courseratingPage = courseRatingService.getRatingByCourseId(courseId, pageRequest);
+        Page<RatingResponse> courseratingPage = courseRatingService.getRatingByCourseId(courseId, pageRequest);
 
         int totalPages = courseratingPage.getTotalPages();
 
-        List<Courserating> courseratings = courseratingPage.getContent();
+        List<RatingResponse> courseratings = courseratingPage.getContent();
         return ResponseEntity.ok(RatingListResponse.builder()
                 .ratings(courseratings)
                 .totalPages(totalPages)
@@ -75,11 +76,11 @@ public class CourseRatingController {
         PageRequest pageRequest = PageRequest.of(page, limit,
                 Sort.by("ratingDate").descending());
 
-        Page<Courserating> courseratingPage = courseRatingService.getRatingsBySentiment(courseId, sentiment, pageRequest);
+        Page<RatingResponse> courseratingPage = courseRatingService.getRatingsBySentiment(courseId, sentiment, pageRequest);
 
         int totalPages = courseratingPage.getTotalPages();
 
-        List<Courserating> courseratings = courseratingPage.getContent();
+        List<RatingResponse> courseratings = courseratingPage.getContent();
         return ResponseEntity.ok(RatingListResponse.builder()
                 .ratings(courseratings)
                 .totalPages(totalPages)
@@ -97,11 +98,11 @@ public class CourseRatingController {
         PageRequest pageRequest = PageRequest.of(page, limit,
                 Sort.by("ratingDate").descending());
 
-        Page<Courserating> courseratingPage = courseRatingService.getRatingsByRate(courseId,rate, pageRequest);
+        Page<RatingResponse> courseratingPage = courseRatingService.getRatingsByRate(courseId,rate, pageRequest);
 
         int totalPages = courseratingPage.getTotalPages();
 
-        List<Courserating> courseratings = courseratingPage.getContent();
+        List<RatingResponse> courseratings = courseratingPage.getContent();
         return ResponseEntity.ok(RatingListResponse.builder()
                 .ratings(courseratings)
                 .totalPages(totalPages)

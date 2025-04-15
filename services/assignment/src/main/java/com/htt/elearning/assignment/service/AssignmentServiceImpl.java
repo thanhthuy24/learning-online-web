@@ -95,8 +95,6 @@ public class AssignmentServiceImpl implements AssignmentService {
                 .dueDate(assignmentDTO.getDueDate())
                 .build();
 
-//        String token = request.getHeader("Authorization");
-
         List<UserResponse> users = enrollmentClient.getUsersByCourseIdClient(assignmentDTO.getCourseId(), token);
 
         Assignment saveAssignment = assignmentRepository.save(newAssignment);

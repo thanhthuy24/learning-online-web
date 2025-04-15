@@ -39,7 +39,9 @@ public class NotificationConsumer {
                         .build();
 
                 notificationService.createNotification(dto, token); // or send Firebase push
+//                notificationService.sendNotificationToEnrolledUsers(event.getCourseId(), dto.getTitle(), dto.getMessage());
             });
+
         } catch (Exception e) {
             log.error("Error processing the assignment created event", e);
         }

@@ -22,7 +22,8 @@ public class FirebaseMessagingService {
     @PostConstruct
     public void initialize() throws IOException {
         FirebaseOptions options = new FirebaseOptions.Builder()
-                .setCredentials(GoogleCredentials.fromStream(new ClassPathResource("firebase-service-account.json").getInputStream()))
+                .setCredentials(GoogleCredentials.fromStream(new ClassPathResource
+                        ("firebase-service-account.json").getInputStream()))
                 .build();
         if (FirebaseApp.getApps().isEmpty()) {
             FirebaseApp.initializeApp(options);

@@ -106,7 +106,7 @@ public class EnrollmentServiceImpl implements EnrollmentService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Cannot find course with id "
                     + enrollmentDTO.getCourseId());
         }
-//        String token = request.getHeader("Authorization");
+
         Long userId = userClient.getUserIdByUsername(token);
 
         Optional<Enrollment> enrollments = enrollmentRepository.findByUserIdAndCourseId(
