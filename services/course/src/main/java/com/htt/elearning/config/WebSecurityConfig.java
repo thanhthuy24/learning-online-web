@@ -33,6 +33,9 @@ public class WebSecurityConfig {
                         .requestMatchers(HttpMethod.PUT, "api/categories/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "api/categories/**").hasRole("ADMIN")
 
+                        .requestMatchers(GET, "/api/tags/**").permitAll()
+                        .requestMatchers(POST, "/api/tags").hasRole("ADMIN")
+
                         .requestMatchers(HttpMethod.GET, "/api/courses/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/course/**").hasRole("ADMIN")
 

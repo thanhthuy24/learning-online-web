@@ -2,6 +2,7 @@ package com.htt.elearning.assignment.controller;
 
 import com.htt.elearning.assignment.dto.AssignmentDTO;
 import com.htt.elearning.assignment.pojo.Assignment;
+import com.htt.elearning.assignment.response.AssignmentFullResponse;
 import com.htt.elearning.assignment.response.AssignmentListResponse;
 import com.htt.elearning.assignment.response.AssignmentResponse;
 import com.htt.elearning.assignment.service.AssignmentService;
@@ -45,12 +46,14 @@ public class ApiAssignmentController {
 
     @GetMapping("/{assignmentId}")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<Assignment> getAssignmentById(
+    public ResponseEntity<AssignmentFullResponse> getAssignmentById(
             @PathVariable("assignmentId") Long assignmentId
     ) {
-        Assignment assignmentById = assignmentService.getAssignmentById(assignmentId);
+        AssignmentFullResponse assignmentById = assignmentService.getAssignmentFullByAssignmentId(assignmentId);
         return ResponseEntity.ok(assignmentById);
     }
+
+//    @GetMapping("/get-assignment-by-id/{assignmentId}")
 
     @GetMapping("/course/{courseId}")
     @ResponseStatus(HttpStatus.OK)
@@ -66,7 +69,7 @@ public class ApiAssignmentController {
     public ResponseEntity<?> getAssignmentsByLessonId(
             @PathVariable Long lessonId
     ){
-        List<Assignment> assignmentList = assignmentService.getAssignmentByLessonId(lessonId);
+        List<AssignmentFullResponse> assignmentList = assignmentService.getAssignmentByLessonId(lessonId);
         return ResponseEntity.ok(assignmentList);
     }
 

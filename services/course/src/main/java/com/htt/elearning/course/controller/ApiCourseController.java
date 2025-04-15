@@ -298,7 +298,7 @@ public class ApiCourseController {
                 .build());
     }
 
-    @GetMapping("/get-course-by-id")
+    @GetMapping("/get-course-by-id/{courseId}")
     public TestCourseResponse getFullCourseResponse(
             @PathVariable Long courseId
     ){

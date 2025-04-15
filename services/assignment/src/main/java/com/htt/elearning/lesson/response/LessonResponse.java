@@ -11,6 +11,7 @@ import java.util.Date;
 @NoArgsConstructor
 @Builder
 public class LessonResponse {
+    private Long id;
     private String name;
     private String description;
     private Date createdDate;

@@ -27,7 +27,8 @@ public class WebConfig {
                                 "api/users/login",
                                 "api/users/register",
                                 "api/users/register-account",
-                                "api/teacher/**")
+                                "api/teacher/**",
+                                "api/token/")
                         .permitAll()
 
                         .requestMatchers(GET, "api/token/get-list-tokens").hasAnyRole(Role.ADMIN, Role.TEACHER, Role.USER)

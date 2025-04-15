@@ -10,4 +10,5 @@ public interface TagService {
     List<Tag> getAllTags();
     TagResponse getTagById(Long id);
     Tag createTag(TagDTO tagDTO);
+    List<TagResponse> getTagsByCourseId(List<Long> tagIds);
 }

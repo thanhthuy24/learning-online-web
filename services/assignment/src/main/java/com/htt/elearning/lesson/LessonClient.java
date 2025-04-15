@@ -5,6 +5,7 @@ import com.htt.elearning.lesson.response.LessonResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestHeader;
 
 @FeignClient(
         name = "course-service",
@@ -13,5 +14,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 )
 public interface LessonClient {
     @GetMapping("/get-lesson/{lessonId}")
-    LessonResponse getLessonById(@PathVariable("lessonId") Long lessonId);
+    LessonResponse getLessonById(
+            @PathVariable("lessonId") Long lessonId,
+            @RequestHeader("Authorization") String token);
 }

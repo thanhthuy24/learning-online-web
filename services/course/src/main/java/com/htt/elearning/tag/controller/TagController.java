@@ -30,6 +30,13 @@ public class TagController {
         return tagService.getTagById(tagId);
     }
 
+    @GetMapping("/get-tags")
+    public ResponseEntity<List<TagResponse>> getTagsByIds(
+            @RequestParam List<Long> tagIds)
+    {
+        return ResponseEntity.ok(tagService.getTagsByCourseId(tagIds));
+    }
+
     @PostMapping("")
     public ResponseEntity<?> createTag(
             @Valid
