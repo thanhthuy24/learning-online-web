@@ -11,3 +11,10 @@ python:
 perspective:
   api:
     key:  #key
+
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"

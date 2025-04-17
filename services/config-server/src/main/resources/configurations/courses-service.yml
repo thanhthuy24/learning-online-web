@@ -36,3 +36,4 @@ application:
     progress-url: http://localhost:8096/api/progress
     notification-url: http://localhost:8096/api/get-notification
     firebase-url: http://localhost:8096/api/notifications
+    teacher-url: http://localhost:8096/api/teacher

@@ -12,7 +12,8 @@ import java.util.List;
 @FeignClient(
         name = "enrollment-service",
         contextId = "enrollmentServiceV1",  // Thêm contextId duy nhất
-        url = "${application.config.enrollment-url}"
+        url = "${application.config.enrollment-url}",
+        fallback = EnrollmentClientFallback.class
 )
 public interface EnrollmentClient {
     @GetMapping("check-enrollment-boolean")

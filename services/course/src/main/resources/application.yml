@@ -19,5 +19,45 @@ python:
 
 jwt:
   expiration: 2592000
-  secretKey:  #secretKey #secretKey
+  secretKey:  #secretKey
+
+#feign:
+#  circuitbreaker:
+#    enabled: true
+
+management:
+  health:
+    circuitbreakers:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      user-service:
+        registerHealthIndicator: true
+        slidingWindowSize: 10
+        failureRateThreshold: 50
+        waitDurationInOpenState: 5s
+        permittedNumberOfCallsInHalfOpenState: 3
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+        minimum-number-of-calls: 5
+
+  retry:
+    instances:
+      user-service:
+        max-attempts: 3
+        wait-duration: 5s
+
+  timelimiter:
+    instances:
+      user-service:
+        timeout-duration: 3s
+
 

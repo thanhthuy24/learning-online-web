@@ -3,3 +3,40 @@ spring:
     import: optional:configserver:http://localhost:8888
   application:
     name: assignment-service
+
+management:
+  health:
+    circuitbreakers:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      enrollment-service:
+        registerHealthIndicator: true
+        slidingWindowSize: 10
+        failureRateThreshold: 50
+        waitDurationInOpenState: 5s
+        permittedNumberOfCallsInHalfOpenState: 3
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+        minimum-number-of-calls: 5
+
+  retry:
+    instances:
+      enrollment-service:
+        max-attempts: 3
+        wait-duration: 5s
+
+  timelimiter:
+    instances:
+      enrollment-service:
+        timeout-duration: 3s
+
+

@@ -144,7 +144,7 @@ public class AssignmentServiceImpl implements AssignmentService {
 
         Boolean checkEnrollment = enrollmentClient.checkEnrollment(userId, courseId, token);
         if (checkEnrollment == null || !checkEnrollment) {
-            new ResponseStatusException(HttpStatus.NOT_FOUND,
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
                     "This course isn't enrolled in your list! Please enroll before participating in this course!!");
         }
         return assignmentRepository.findByCourseId(courseId);

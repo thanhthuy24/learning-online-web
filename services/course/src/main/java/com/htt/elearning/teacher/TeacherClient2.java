@@ -13,7 +13,8 @@ import java.util.List;
 @FeignClient(
         name = "user-service",
         contextId = "userServiceV3",  // Thêm contextId duy nhất
-        url = "http://localhost:8090/api/teacher"
+        url = "${application.config.teacher-url}",
+        fallback = TeacherClient2Fallback.class
 )
 public interface TeacherClient2 {
     @GetMapping("/get-information")

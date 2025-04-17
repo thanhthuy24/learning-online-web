@@ -18,6 +18,11 @@ public class GatewayConfig {
                                 "/api/teachers/**",
                                 "/api/token/**",
                                 "/api/teacher/**")
+                        .filters(f -> f
+                                .circuitBreaker(config -> config
+                                        .setName("userServiceV3")
+                                        .setFallbackUri("forward:/fallbackRoute")
+                                ))
                         .uri("lb://USER-SERVICE"))
                 .route("courses-service",
                         r -> r.path(
@@ -39,6 +44,11 @@ public class GatewayConfig {
                                 "/api/score/**",
                                 "/api/assignment-done/**"
                                 )
+                        .filters(f -> f
+                                .circuitBreaker(config -> config
+                                        .setName("enrollmentServiceV1")
+                                        .setFallbackUri("forward:/fallbackRoute")
+                                ))
                         .uri("lb://ASSIGNMENT-SERVICE"))
                 .route("cloudinary-service",
                         r->r.path(

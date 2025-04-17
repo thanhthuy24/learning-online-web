@@ -26,4 +26,8 @@ jwt:
   expiration: 2592000
   secretKey:  #secretKey
 
-
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
