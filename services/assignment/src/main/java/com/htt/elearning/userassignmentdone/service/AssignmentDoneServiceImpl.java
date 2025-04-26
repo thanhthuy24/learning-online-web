@@ -59,7 +59,7 @@ public class AssignmentDoneServiceImpl implements AssignmentDoneService {
         String token = request.getHeader("Authorization");
         Long userId = userClient.getUserIdByUsernameClient(token);
 
-        Userassignmentdone assignmentDone = assignmentDoneRepository.findByUserIdAndAssignmentId(userId, assignmentId);
+        Userassignmentdone assignmentDone = assignmentDoneRepository.findByAssignmentId(assignmentId);
         if (assignmentDone == null) {
             return null;
         }

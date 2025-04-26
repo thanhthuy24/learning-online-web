@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 import java.util.Optional;
@@ -40,4 +41,14 @@ public interface UserRepository extends JpaRepository<User, Long>{
     @Query("SELECT r.id FROM User r WHERE " +
             "LOWER(r.username) LIKE LOWER(CONCAT('%', :keyword, '%'))")
     List<Long> searchUserIdsByKeyword(@Param("keyword") String keyword);
+
+    @Query("""
+    SELECT FUNCTION('DATE_FORMAT', u.createdDate, '%Y-%m') as month,
+        count(u.id) AS total
+    FROM User u
+    WHERE u.role.id = :roleId
+    GROUP BY FUNCTION('DATE_FORMAT', u.createdDate, '%Y-%m')
+    ORDER BY FUNCTION('DATE_FORMAT', u.createdDate, '%Y-%m') ASC
+    """)
+    List<Object[]> getNumberOfMonthlyUsers(@Param("roleId") Long roleId);
 }

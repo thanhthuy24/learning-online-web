@@ -11,7 +11,8 @@ import java.util.List;
 @FeignClient(
         name = "user-service",
         contextId = "userServiceV1",
-        url = "${application.config.user-url}"
+        url = "${application.config.user-url}",
+        fallback = UserClientFallback.class
 )
 public interface UserClient {
     @GetMapping("/get-username")

@@ -10,4 +10,6 @@ public interface VideoCompletedService {
     Videocompleted createVideocompleted(VideoCompletedDTO videoCompleteDTO) throws DataNotFoundException;
     List<Videocompleted> getVideoCompletedBy(Long userId) throws DataNotFoundException;
     Long countVideoCompletedBy(Long lessonId) throws DataNotFoundException;
+
+    List<Videocompleted> getVideoCompletedByLessonId(Long lessonId);
 }

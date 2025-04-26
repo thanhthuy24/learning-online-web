@@ -6,6 +6,9 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import java.util.List;
 
 @FeignClient(
         name = "user-service",
@@ -24,4 +27,10 @@ public interface UserClient {
 
     @GetMapping("/get-current-user")
     ResponseEntity<UserResponse> getCurrentUser();
+
+    @GetMapping("/get-users-by-ids")
+    List<UserResponse> getUsersByIdsClient(
+            @RequestParam("userIds") List<Long> userIds,
+            @RequestHeader("Authorization") String token
+    );
 }

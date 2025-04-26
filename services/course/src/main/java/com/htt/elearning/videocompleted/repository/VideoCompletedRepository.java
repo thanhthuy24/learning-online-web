@@ -16,4 +16,10 @@ public interface VideoCompletedRepository extends JpaRepository<Videocompleted, 
     @Query("SELECT COUNT(h.id) FROM Videocompleted h WHERE h.userId = :userId AND h.video.lesson.id = :lessonId")
     Long countWatchedVideosByUserAndLessonId(@Param("userId") Long userId, @Param("lessonId") Long lessonId);
 
+    @Query("""
+        SELECT v 
+        FROM Videocompleted v
+        WHERE v.video.lesson.id = :lessonId AND v.userId = :userId
+    """)
+    List<Videocompleted> findByLessonIdAndUserId(Long lessonId, Long userId);
 }

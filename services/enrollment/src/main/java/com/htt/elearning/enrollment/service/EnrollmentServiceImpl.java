@@ -121,7 +121,7 @@ public class EnrollmentServiceImpl implements EnrollmentService {
                 .build();
         enrollmentRepository.save(enrollment);
 
-        progressService.calculateProgress(existingCourse.getId());
+        progressService.createNewProgress(existingCourse.getId());
 
         return enrollment;
     }

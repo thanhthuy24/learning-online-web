@@ -2,7 +2,9 @@ package com.htt.elearning.videocompleted.service;
 
 import com.htt.elearning.enrollment.EnrollmentClient;
 import com.htt.elearning.exceptions.DataNotFoundException;
+import com.htt.elearning.lesson.pojo.Lesson;
 import com.htt.elearning.lesson.repository.LessonRepository;
+import com.htt.elearning.lesson.service.LessonService;
 import com.htt.elearning.progress.ProgressClient;
 import com.htt.elearning.user.UserClient;
 import com.htt.elearning.video.pojo.Video;
@@ -24,6 +26,7 @@ import java.util.List;
 public class VideoCompletedServiceImpl implements VideoCompletedService {
     private final VideoCompletedRepository videoCompletedRepository;
     private final VideoRepository videoRepository;
+    private final LessonService lessonService;
     private final UserClient userClient;
     private final EnrollmentClient enrollmentClient;
     private final ProgressClient progressClient;
@@ -84,5 +87,22 @@ public class VideoCompletedServiceImpl implements VideoCompletedService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Video not found!");
         }
         return count;
+    }
+
+    @Override
+    public List<Videocompleted> getVideoCompletedByLessonId(Long lessonId) {
+        String token = request.getHeader("Authorization");
+        Long userId = userClient.getUserIdByUsernameClient(token);
+
+        Lesson existingLesson = lessonService.getLessonById(lessonId);
+
+        Boolean checkEnrollment = enrollmentClient.checkEnrollmentPt2(userId, existingLesson.getCourse().getId(), token);
+        if (checkEnrollment == null || !checkEnrollment) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+                    "This course isn't enrolled in your list! Please enroll before participating in this course!!");
+        }
+
+        List<Videocompleted> listVideosCompleted = videoCompletedRepository.findByLessonIdAndUserId(lessonId, userId);
+        return listVideosCompleted;
     }
 }

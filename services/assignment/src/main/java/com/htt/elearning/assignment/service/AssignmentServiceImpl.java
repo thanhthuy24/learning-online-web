@@ -14,6 +14,7 @@ import com.htt.elearning.kafka.AssignmentCreateEvent;
 import com.htt.elearning.kafka.AssignmentProducer;
 import com.htt.elearning.lesson.LessonClient;
 import com.htt.elearning.lesson.response.LessonResponse;
+import com.htt.elearning.notification.FirebaseClient;
 import com.htt.elearning.tag.TagClient;
 import com.htt.elearning.tag.response.TagResponse;
 import com.htt.elearning.user.UserClient;
@@ -42,6 +43,7 @@ public class AssignmentServiceImpl implements AssignmentService {
     private final EnrollmentClient enrollmentClient;
     private final AssignmentProducer assignmentProducer;
     private final HttpServletRequest request;
+    private final FirebaseClient firebaseClient;
 
     @Override
     public Page<AssignmentResponse> getAllAssignment(PageRequest pageRequest) {
@@ -62,7 +64,7 @@ public class AssignmentServiceImpl implements AssignmentService {
         String token = request.getHeader("Authorization");
         Assignment assignment = assignmentRepository.findAssignmentById(assignmentId);
 
-        TagResponse existTag = tagClient.getTagById(assignment.getTagId());
+        TagResponse existTag = tagClient.getTagById(assignment.getTagId(), token);
         TestCourseResponse existCourse = courseClient.getFullCourseResponse(assignment.getCourseId());
         LessonResponse existLesson = lessonClient.getLessonById(assignment.getLessonId(), token);
 
@@ -72,7 +74,7 @@ public class AssignmentServiceImpl implements AssignmentService {
     @Override
     public Assignment createAssignment(AssignmentDTO assignmentDTO) throws DataNotFoundException {
         String token = request.getHeader("Authorization");
-        TagResponse existTag = tagClient.getTagById(assignmentDTO.getTagId());
+        TagResponse existTag = tagClient.getTagById(assignmentDTO.getTagId(), token);
         if (existTag == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Tag not found");
         }
@@ -99,14 +101,26 @@ public class AssignmentServiceImpl implements AssignmentService {
 
         Assignment saveAssignment = assignmentRepository.save(newAssignment);
 
-        assignmentProducer.sendAssignmentCreateEvent(
-                AssignmentCreateEvent.builder()
-                        .id(saveAssignment.getId())
-                        .name(saveAssignment.getName())
-                        .courseId(saveAssignment.getCourseId())
-                        .courseName(existCourse.getName())
-                        .createdAt(new Date())
-                .build(), token);
+        AssignmentCreateEvent event = AssignmentCreateEvent.builder()
+                .id(saveAssignment.getId())
+                .name(saveAssignment.getName())
+                .courseId(existCourse.getId())
+                .courseName(existCourse.getName())
+                .createdAt(new Date())
+                .build();
+
+        assignmentProducer.sendAssignmentCreateEvent(event, token);
+        users.forEach(user -> {
+            try {
+                firebaseClient.sendNotification(
+                        assignmentDTO.getCourseId(),
+                        "Khoá học " + existCourse.getName() + " bạn đang ký vừa có bài học mới!",
+                        "Bài học mới: " + assignmentDTO.getName() + ", hãy check ngay nào, " + user.getUsername() + " ơi!",
+                        token);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
 
         return newAssignment;
     }
@@ -142,7 +156,15 @@ public class AssignmentServiceImpl implements AssignmentService {
         String token = request.getHeader("Authorization");
         Long userId = userClient.getUserIdByUsernameClient(token);
 
-        Boolean checkEnrollment = enrollmentClient.checkEnrollment(userId, courseId, token);
+        Boolean checkEnrollment;
+        try {
+            checkEnrollment = enrollmentClient.checkEnrollment(userId, courseId, token);
+        } catch (Exception ex) {
+//            log.error("Enrollment service unavailable. Cannot verify enrollment.", ex);
+            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE,
+                    "Enrollment service is temporarily unavailable. Please try again later.");
+        }
+
         if (checkEnrollment == null || !checkEnrollment) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND,
                     "This course isn't enrolled in your list! Please enroll before participating in this course!!");
@@ -156,7 +178,7 @@ public class AssignmentServiceImpl implements AssignmentService {
         Assignment existingAssignment = getAssignmentById(id);
         if(existingAssignment != null) {
 
-            TagResponse existTag = tagClient.getTagById(assignmentDTO.getTagId());
+            TagResponse existTag = tagClient.getTagById(assignmentDTO.getTagId(), token);
             if (existTag == null) {
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Tag not found");
             }
@@ -171,7 +193,7 @@ public class AssignmentServiceImpl implements AssignmentService {
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Lesson not found by id: " + assignmentDTO.getLessonId());
             }
             existingAssignment.setName(assignmentDTO.getName());
-            existingAssignment.setCourseId(assignmentDTO.getCourseId());
+            existingAssignment.setCourseId(existingAssignment.getCourseId());
             existingAssignment.setLessonId(assignmentDTO.getLessonId());
             existingAssignment.setTagId(assignmentDTO.getTagId());
             existingAssignment.setDueDate(assignmentDTO.getDueDate());

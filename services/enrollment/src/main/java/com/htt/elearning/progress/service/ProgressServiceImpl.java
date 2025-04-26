@@ -96,6 +96,20 @@ public class ProgressServiceImpl implements ProgressService {
     }
 
     @Override
+    public float createNewProgress(Long courseId){
+        String token = request.getHeader("Authorization");
+        Long userId = userClient.getUserIdByUsername(token);
+        Progress progress = new Progress();
+        progress.setCourseId(courseId);
+        progress.setUserId(userId);
+        progress.setCompletionPercentage(0.0f);
+        progress.setStatus("In Progress");
+        progress.setUpdatedDate(new Date());
+        progressRepository.save(progress);
+        return progress.getCompletionPercentage();
+    }
+
+    @Override
     public Optional<Progress> getProgressByAdmin(Long userId, Long courseId) {
         Optional<Progress> progressList = progressRepository.findByCourseIdAndUserId(courseId, userId);
         if (progressList.isEmpty()) {

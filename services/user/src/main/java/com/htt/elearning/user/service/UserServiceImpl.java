@@ -158,7 +158,7 @@ public class UserServiceImpl implements UserService {
         newUser.setRole(role);
 
         // kiểm tra nếu có account_id thì không yêu cầu password
-        if(userDTO.getFacebookAccountId().equals('0') && userDTO.getGoogleAccountId().equals('0')){
+        if(userDTO.getFacebookAccountId().equals("0") && userDTO.getGoogleAccountId().equals("0")){
             String password = userDTO.getPassword();
             String encodedPassword = passwordEncoder.encode(password);
             // noi sau trong phan spring security
@@ -358,7 +358,7 @@ public class UserServiceImpl implements UserService {
     public List<UserResponse> getUsersByIds(List<Long> userIds) {
         List<User> users = userRepository.findAllById(userIds);
         return users.stream()
-                .map(user -> UserResponse.fromUser(user)) // hoặc dùng UserResponse.fromEntity(user)
+                .map(user -> UserResponse.fromUser(user))
                 .collect(Collectors.toList());
     }
 
@@ -366,6 +366,16 @@ public class UserServiceImpl implements UserService {
     public Page<UserResponse> getUsersTeachers(PageRequest pageRequest, String key) {
 //        Page<User> user = userRepository.find
         return null;
+    }
+
+    @Override
+    public List<MonthStatDTO> getMonthlyGrowth(Long roleId) {
+        List<Object[]> rawData = userRepository.getNumberOfMonthlyUsers(roleId);
+
+        List<MonthStatDTO> result = rawData.stream()
+                .map(row -> new MonthStatDTO((String) row[0], ((Number) row[1]).longValue()))
+                .collect(Collectors.toList());
+        return result;
     }
 
 }

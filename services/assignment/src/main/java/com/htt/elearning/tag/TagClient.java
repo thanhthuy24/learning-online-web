@@ -17,7 +17,9 @@ import java.util.List;
 )
 public interface TagClient {
     @GetMapping("/{tagId}")
-    TagResponse getTagById(@PathVariable Long tagId);
+    TagResponse getTagById(
+            @PathVariable Long tagId,
+            @RequestHeader("Authorization") String token);
 
     @GetMapping("/get-tags")
     ResponseEntity<List<TagResponse>> getTagsByIds(

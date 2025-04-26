@@ -381,4 +381,9 @@ public class UserController {
     ){
         return userService.getUsersByIds(userIds);
     }
+
+    @GetMapping("/growth/{roleId}")
+    public ResponseEntity<?> getUserGrowth(@PathVariable Long roleId) {
+        return ResponseEntity.ok(userService.getMonthlyGrowth(roleId));
+    }
 }

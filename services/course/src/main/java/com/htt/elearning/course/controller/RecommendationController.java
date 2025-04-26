@@ -30,7 +30,6 @@ public class RecommendationController {
     public ResponseEntity<?> getRecommendation2(
             @PathVariable Long userId
     ) {
-        List<Course> recommendCourses = recommendationService.getRecommendedCourses2(userId);
-        return ResponseEntity.ok(recommendCourses);
+        return ResponseEntity.ok(recommendationService.getRecommendedCourses2(userId));
     }
 }

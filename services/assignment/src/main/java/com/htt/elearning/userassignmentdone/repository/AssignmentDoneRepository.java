@@ -4,6 +4,6 @@ import com.htt.elearning.userassignmentdone.pojo.Userassignmentdone;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface AssignmentDoneRepository extends JpaRepository<Userassignmentdone, Long> {
-    Userassignmentdone findByUserIdAndAssignmentId(Long userId, Long assignmentId);
+    Userassignmentdone findByAssignmentId(Long assignmentId);
     Long countByAssignmentId(Long assignmentId);
 }

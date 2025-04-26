@@ -26,8 +26,9 @@ public class EnrollmentResponseClient {
                 .id(enrollment.getId())
                 .course(testCourseResponse)
                 .user(userResponse)
+                .enrollmentDate(enrollment.getEnrollmentDate())
                 .build();
-        enrollmentResponse.setEnrollmentDate(new Date());
+//        enrollmentResponse.setEnrollmentDate(new Date());
         return enrollmentResponse;
     }
 }

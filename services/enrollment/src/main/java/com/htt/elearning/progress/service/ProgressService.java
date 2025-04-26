@@ -9,4 +9,5 @@ public interface ProgressService {
     Optional<Progress> getProgressByAdmin(Long userId, Long courseId);
     Boolean checkProgressForCertificate(Long userId, Long courseId);
     Optional<Progress> getProgressByUser(Long courseId);
+    float createNewProgress(Long courseId);
 }

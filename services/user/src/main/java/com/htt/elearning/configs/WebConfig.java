@@ -56,8 +56,8 @@ public class WebConfig {
                         .requestMatchers(GET, "/api/users/get-user/").permitAll()
                         .requestMatchers(GET, "/api/users/get-users-by-ids").permitAll()
                         .requestMatchers(GET, "/api/users/get-users/").hasRole(Role.ADMIN)
+                        .requestMatchers(GET, "/api/users/growth/").hasRole(Role.ADMIN)
 
-                        .requestMatchers(POST, "api/users/**").hasAnyRole(Role.ADMIN)
                         .requestMatchers(PATCH, "api/users/update-active/").hasAnyRole(Role.ADMIN)
                         .requestMatchers(PUT, "api/users/update-user/").hasAnyRole(Role.ADMIN, Role.USER, Role.TEACHER)
                         .requestMatchers(DELETE, "api/users/**").hasAnyRole(Role.ADMIN)

@@ -35,3 +35,4 @@ application:
     enrollment-url: http://localhost:8096/api/enrollments
     lesson-url: http://localhost:8096/api/lessons
     notification-url: http://localhost:8096/api/get-notification
+    firebase-url: http://localhost:8096/api/notifications

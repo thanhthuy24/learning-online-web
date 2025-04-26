@@ -11,7 +11,7 @@ import java.util.*;
 
 @Service
 @RequiredArgsConstructor
-public class SpellCheckServiceImpl {
+public class SpellCheckServiceImpl implements SpellCheckService {
     private final String API_URL = "https://api.languagetool.org/v2/check"; // API của LanguageTool
     private final RestTemplate restTemplate = new RestTemplate();
 

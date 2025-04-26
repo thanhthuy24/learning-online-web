@@ -4,6 +4,10 @@ spring:
   application:
     name: assignment-service
 
+feign:
+  circuitbreaker:
+    enabled: true
+
 management:
   health:
     circuitbreakers:

@@ -4,6 +4,8 @@ import com.htt.elearning.assignment.service.AssignmentService;
 import com.htt.elearning.essay.dto.EssayDTO;
 import com.htt.elearning.essay.pojo.Essay;
 import com.htt.elearning.essay.response.EssayListResponse;
+import com.htt.elearning.essay.response.EssayListResponseClient;
+import com.htt.elearning.essay.response.EssayResponseClient;
 import com.htt.elearning.essay.service.EssayService;
 import com.htt.elearning.exceptions.DataNotFoundException;
 import jakarta.validation.Valid;
@@ -45,11 +47,11 @@ public class EssayController {
 
         PageRequest pageRequest = PageRequest.of(page, limit,
                 Sort.by("createdDate").descending());
-        Page<Essay> essayPage = essayService.getEssaysByAssignment(assignmentId, pageRequest);
+        Page<EssayResponseClient> essayPage = essayService.getEssaysByAssignment(assignmentId, pageRequest);
 
         int totalPages = essayPage.getTotalPages();
-        List<Essay> essays = essayPage.getContent();
-        return ResponseEntity.ok(EssayListResponse.builder()
+        List<EssayResponseClient> essays = essayPage.getContent();
+        return ResponseEntity.ok(EssayListResponseClient.builder()
                 .essays(essays)
                 .totalPages(totalPages)
                 .build());

@@ -8,6 +8,7 @@ import com.htt.elearning.user.response.UserResponse;
 import org.springframework.data.domain.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public interface UserService {
@@ -42,4 +43,6 @@ public interface UserService {
     List<UserResponse> getUsersByIds(List<Long> userIds);
 
     Page<UserResponse> getUsersTeachers(PageRequest pageRequest, String key);
+
+    List<MonthStatDTO> getMonthlyGrowth(Long roleId);
 }

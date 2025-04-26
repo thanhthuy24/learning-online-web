@@ -54,4 +54,9 @@ public class VideoCompletedController {
     {
         return videoCompleteService.countVideoCompletedBy(lessonId);
     }
+
+    @GetMapping("/markup-video-completed/{lessonId}")
+    public ResponseEntity<?> getVideoCompletedByMarkup(@PathVariable Long lessonId) {
+        return ResponseEntity.ok(videoCompleteService.getVideoCompletedByLessonId(lessonId));
+    }
 }

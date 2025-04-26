@@ -61,7 +61,8 @@ public class GatewayConfig {
                                 "/api/comments/**",
                                 "/api/reply/**",
                                 "/api/progress/**",
-                                "/api/rating/**"
+                                "/api/rating/**",
+                                "/api/spell-check"
                         ).uri("lb://ENROLLMENT-SERVICE"))
                 .route("notification-service",
                         r -> r.path(
