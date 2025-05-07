@@ -156,9 +156,10 @@ public class CourseServiceImpl implements CourseService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "Can not find teacher with id: " + teacherId));
 
-        if (existingTeacher.getUserId() != userId) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Forbidden");
-        }
+//        if (existingTeacher.getUserId() != userId) {
+//            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Forbidden");
+//        }
+
         Page<Course> coursesPage = courseRepository.findByTeacherId(teacherId, pageable);
         List<Course> courses = coursesPage.getContent();
 

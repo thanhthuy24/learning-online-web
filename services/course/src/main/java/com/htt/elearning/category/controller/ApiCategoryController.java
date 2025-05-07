@@ -19,8 +19,8 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("api/category")
 public class ApiCategoryController {
-    @Autowired
-    private CategoryService categoryService;
+    private final CategoryService categoryService;
+
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<List<CategoryResponse>> getAllCategories(
@@ -61,6 +61,14 @@ public class ApiCategoryController {
     public ResponseEntity<String> deleteCategory(@PathVariable Long cateId) {
         categoryService.deleteCategory(cateId);
         return ResponseEntity.ok("delete category successfully!");
+    }
+
+    @GetMapping("/get-list-categories-by-ids")
+    @ResponseStatus(HttpStatus.OK)
+    public List<CategoryResponse> getAllCategoriesByIds(
+            @RequestParam List<Long> ids
+    ){
+        return categoryService.getListCategories(ids);
     }
 
 }

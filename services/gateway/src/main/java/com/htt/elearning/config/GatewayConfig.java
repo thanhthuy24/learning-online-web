@@ -17,7 +17,11 @@ public class GatewayConfig {
                                 "/api/roles/**",
                                 "/api/teachers/**",
                                 "/api/token/**",
-                                "/api/teacher/**")
+                                "/api/teacher/**",
+                                "/api/login/**",
+                                "/api/user-overview/**",
+                                "/api/user-interesting/**"
+                        )
                         .filters(f -> f
                                 .circuitBreaker(config -> config
                                         .setName("userServiceV3")
@@ -32,6 +36,7 @@ public class GatewayConfig {
                                 "/api/lessons/**",
                                 "/api/videos/**",
                                 "/api/video-completed/**",
+                                "/api/wishlist/**",
                                 "/api/ai-recommend/**")
                         .uri("lb://COURSES-SERVICE"))
                 .route("assignment-service",
@@ -43,13 +48,7 @@ public class GatewayConfig {
                                 "/api/questions/**",
                                 "/api/score/**",
                                 "/api/assignment-done/**"
-                                )
-                        .filters(f -> f
-                                .circuitBreaker(config -> config
-                                        .setName("enrollmentServiceV1")
-                                        .setFallbackUri("forward:/fallbackRoute")
-                                ))
-                        .uri("lb://ASSIGNMENT-SERVICE"))
+                        ).uri("lb://ASSIGNMENT-SERVICE"))
                 .route("cloudinary-service",
                         r->r.path(
                                 "/api/cloudinary/**"
@@ -62,8 +61,14 @@ public class GatewayConfig {
                                 "/api/reply/**",
                                 "/api/progress/**",
                                 "/api/rating/**",
-                                "/api/spell-check"
-                        ).uri("lb://ENROLLMENT-SERVICE"))
+                                "/api/spell-check",
+                                "/api/interactions/**"
+                        ).filters(f -> f
+                                .circuitBreaker(config -> config
+                                        .setName("enrollmentServiceV1")
+                                        .setFallbackUri("forward:/fallbackRoute")
+                                ))
+                        .uri("lb://ENROLLMENT-SERVICE"))
                 .route("notification-service",
                         r -> r.path(
                                 "/api/get-notification/**",

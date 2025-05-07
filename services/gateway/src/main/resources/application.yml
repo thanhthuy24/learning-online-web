@@ -61,15 +61,14 @@ secure:
     - /api/tags/**
     - /api/questions/count/assignment/**
     - /api/token/**
-#    - /actuator/health
-#    - /actuator/health/circuitbreakers
-#    - /actuator/circuitbreakers
+    - /api/login/auth/social-login
+    - /api/login/auth/social/callback
   open-paths-post:
     - /api/users/login
     - /api/users/register
     - /api/users/register-account
-    - /api/login/auth/social-login
-    - /api/login/auth/social/callback
     - /api/cloudinary/upload
     - /api/cloudinary/upload-image
     - /api/token
+    - /api/user-overview/**
+    - /api/user-interesting/**

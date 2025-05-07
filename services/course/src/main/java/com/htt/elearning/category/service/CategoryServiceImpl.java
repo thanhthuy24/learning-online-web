@@ -4,6 +4,8 @@ import com.htt.elearning.category.dto.CategoryDTO;
 import com.htt.elearning.category.pojo.Category;
 import com.htt.elearning.category.repository.CategoryRepository;
 import com.htt.elearning.category.response.CategoryResponse;
+import com.htt.elearning.course.response.TestCourseResponse;
+import com.htt.elearning.teacher.response.TeacherResponseClient;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,5 +65,16 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public void deleteCategory(Long id) {
         categoryRepository.deleteById(id);
+    }
+
+    @Override
+    public List<CategoryResponse> getListCategories(List<Long> ids) {
+        List<Category> categories = categoryRepository.findAllById(ids);
+        List<CategoryResponse> categoryResponses = categories.stream()
+                .map(category -> {
+                    return CategoryResponse.fromCategory(category);
+                })
+                .collect(Collectors.toList());
+        return categoryResponses;
     }
 }

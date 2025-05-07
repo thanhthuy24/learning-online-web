@@ -45,6 +45,9 @@ public class WebSecurityConfig {
 
                         .requestMatchers(POST, "/api/video-completed/").hasRole("USER")
 
+                        .requestMatchers(GET, "/api/wishlist/list-wishlist").permitAll()
+                        .requestMatchers(POST, "/api/wishlist").hasRole("USER")
+
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

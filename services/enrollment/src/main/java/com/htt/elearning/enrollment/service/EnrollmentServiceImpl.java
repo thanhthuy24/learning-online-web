@@ -8,6 +8,7 @@ import com.htt.elearning.enrollment.dtos.EnrollmentDTO;
 import com.htt.elearning.enrollment.pojo.Enrollment;
 import com.htt.elearning.enrollment.repository.EnrollmentRepository;
 import com.htt.elearning.enrollment.response.EnrollmentResponseClient;
+import com.htt.elearning.interactions.service.InteractionService;
 import com.htt.elearning.progress.service.ProgressService;
 import com.htt.elearning.teacher.response.TeacherResponseClient;
 import com.htt.elearning.user.UserClient;
@@ -32,6 +33,7 @@ public class EnrollmentServiceImpl implements EnrollmentService {
     private final CourseClient courseClient;
     private final UserClient userClient;
     private final ProgressService progressService;
+    private final InteractionService interactionService;
     private final HttpServletRequest request;
 
     @Override
@@ -122,6 +124,7 @@ public class EnrollmentServiceImpl implements EnrollmentService {
         enrollmentRepository.save(enrollment);
 
         progressService.createNewProgress(existingCourse.getId());
+        interactionService.createInteraction(existingCourse.getId());
 
         return enrollment;
     }

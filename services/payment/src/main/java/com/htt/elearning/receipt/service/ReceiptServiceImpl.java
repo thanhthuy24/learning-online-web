@@ -4,6 +4,7 @@ import com.htt.elearning.course.CourseClient;
 import com.htt.elearning.enrollment.EnrollmentClient;
 import com.htt.elearning.enrollment.dto.EnrollmentDTO;
 import com.htt.elearning.exceptions.DataNotFoundException;
+import com.htt.elearning.interaction.InteractionClient;
 import com.htt.elearning.receipt.dto.ReceiptDTO;
 import com.htt.elearning.receipt.pojo.Cart;
 import com.htt.elearning.receipt.pojo.Receipt;
@@ -33,7 +34,7 @@ public class ReceiptServiceImpl implements ReceiptService {
     private final ReceiptRepository receiptRepository;
     private final ReceiptDetailRepository receiptDetailRepository;
     private final UserClient userClient;
-    private final CourseClient courseClient;
+    private final InteractionClient interactionClient;
     private final ModelMapper modelMapper;
     private final HttpServletRequest request;
 
@@ -130,13 +131,7 @@ public class ReceiptServiceImpl implements ReceiptService {
                 enrollmentDTO.setCourseId(c.getId());
 
                 enrollmentClient.createEnrollmentClient(enrollmentDTO, token);
-
-//                Enrollment enrollment = new Enrollment();
-//                enrollment.setEnrollmentDate(new Date());
-//                enrollment.setUser(this.userRepository.getUserByUsername(username));
-//                enrollment.setCourse(courseRepository.getCourseById(c.getId()));
-//
-//                enrollmentRepository.save(enrollment);
+                interactionClient.getInteractionByCourseId(c.getId(), token);
             }
 
         }

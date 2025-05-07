@@ -18,7 +18,7 @@ python:
     url: http://127.0.0.1:5000
 
 jwt:
-  expiration:
+  expiration: 2592000
   secretKey:  #secretKey
 
 #feign:

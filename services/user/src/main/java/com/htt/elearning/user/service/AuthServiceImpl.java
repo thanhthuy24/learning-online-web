@@ -46,21 +46,6 @@ public class AuthServiceImpl implements AuthService {
                     Arrays.asList("email", "profile", "openid"));
             url = urlBuilder.build();
         }
-//        else if ("facebook".equals(loginType)) {
-//            /*
-//            url = String.format("https://www.facebook.com/v3.2/dialog/oauth?client_id=%s&redirect_uri=%s&scope=email,public_profile&response_type=code",
-//                    facebookClientId, facebookRedirectUri);
-//             */
-//            url = UriComponentsBuilder
-//                    .fromUriString(facebookAuthUri)
-//                    .queryParam("client_id", facebookClientId)
-//                    .queryParam("redirect_uri", facebookRedirectUri)
-//                    .queryParam("scope", "email,public_profile")
-//                    .queryParam("response_type", "code")
-//                    .build()
-//                    .toUriString();
-//        }
-
         return url;
 
     }
@@ -92,31 +77,6 @@ public class AuthServiceImpl implements AuthService {
                 return new ObjectMapper().readValue(
                         restTemplate.getForEntity(googleUserInfoUri, String.class).getBody(),
                         new TypeReference<>() {});
-            //break;
-
-//            case "facebook":
-//                // Facebook token request setup
-//                String urlGetAccessToken = UriComponentsBuilder
-//                        .fromUriString(facebookTokenUri)
-//                        .queryParam("client_id", facebookClientId)
-//                        .queryParam("redirect_uri", facebookRedirectUri)
-//                        .queryParam("client_secret", facebookClientSecret)
-//                        .queryParam("code", code)
-//                        .toUriString();
-//
-//                // Use RestTemplate to fetch the Facebook access token
-//                ResponseEntity<String> response = restTemplate.getForEntity(urlGetAccessToken, String.class);
-//                ObjectMapper mapper = new ObjectMapper();
-//                JsonNode node = mapper.readTree(response.getBody());
-//                accessToken = node.get("access_token").asText();
-//
-//                // Set the URL for the Facebook API to fetch user info
-//                // Lấy thông tin người dùng
-//                String userInfoUri = facebookUserInfoUri + "&access_token=" + accessToken;
-//                return mapper.readValue(
-//                        restTemplate.getForEntity(userInfoUri, String.class).getBody(),
-//                        new TypeReference<>() {});
-//            //break;
 
             default:
                 System.out.println("Unsupported login type: " + loginType);

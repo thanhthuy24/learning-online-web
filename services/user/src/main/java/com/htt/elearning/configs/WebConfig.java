@@ -28,7 +28,12 @@ public class WebConfig {
                                 "api/users/register",
                                 "api/users/register-account",
                                 "api/teacher/**",
-                                "api/token/")
+                                "api/token/",
+                                "api/login/auth/social-login",
+                                "api/login/auth/social/callback",
+                                "api/user-overview/**",
+                                "api/user-interesting/**"
+                                )
                         .permitAll()
 
                         .requestMatchers(GET, "api/token/get-list-tokens").hasAnyRole(Role.ADMIN, Role.TEACHER, Role.USER)
@@ -61,6 +66,10 @@ public class WebConfig {
                         .requestMatchers(PATCH, "api/users/update-active/").hasAnyRole(Role.ADMIN)
                         .requestMatchers(PUT, "api/users/update-user/").hasAnyRole(Role.ADMIN, Role.USER, Role.TEACHER)
                         .requestMatchers(DELETE, "api/users/**").hasAnyRole(Role.ADMIN)
+                        .requestMatchers(GET, "/api/wishlist/list-wishlist").hasRole(Role.USER)
+                        .requestMatchers(POST, "/api/wishlist").hasRole(Role.USER)
+
+                        .requestMatchers(POST, "/api/interactions/**").hasRole(Role.USER)
 
                         .anyRequest().authenticated()
                 )

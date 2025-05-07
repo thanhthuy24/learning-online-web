@@ -1,6 +1,7 @@
 package com.htt.elearning.course.service;
 
 import com.htt.elearning.course.dto.CourseDTO;
+import com.htt.elearning.course.dto.RecommendDTO;
 import com.htt.elearning.course.pojo.Course;
 import com.htt.elearning.course.repository.CourseRepository;
 import com.htt.elearning.course.response.TestCourseResponse;
@@ -8,6 +9,7 @@ import com.htt.elearning.teacher.TeacherClient2;
 import com.htt.elearning.teacher.response.TeacherResponseClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -39,6 +41,47 @@ public class RecommendationServiceImpl implements RecommendationService {
     @Override
     public List<TestCourseResponse> getRecommendedCourses2(Long userId) {
         List<Long> recommendedCourseId = restTemplate.getForObject(pythonApiUrl + "/recommend?user_id=" + userId, List.class);
+        List<Course> courses = courseRepository.findCoursesByIds(recommendedCourseId);
+
+        List<Long> teacherIds = courses.stream()
+                .map(Course::getTeacherId)
+                .distinct()
+                .collect(Collectors.toList());
+
+        // 3. Gọi sang TeacherService để lấy thông tin teacher
+        List<TeacherResponseClient> teachers = teacherClient2.getInformationTeacher(teacherIds);
+        Map<Long, TeacherResponseClient> teacherMap = teachers.stream()
+                .collect(Collectors.toMap(TeacherResponseClient::getId, Function.identity()));
+
+        // 4. Map Course -> TestCourseResponse
+        List<TestCourseResponse> courseResponses = courses.stream()
+                .map(course -> {
+                    TeacherResponseClient teacher = teacherMap.get(course.getTeacherId());
+                    return TestCourseResponse.fromCourse(course, teacher);
+                })
+                .collect(Collectors.toList());
+
+        return courseResponses;
+    }
+
+    @Override
+    public List<TestCourseResponse> getRecommendedCoursesForNewUser(RecommendDTO recommendDTO) {
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity<RecommendDTO> entity = new HttpEntity<>(recommendDTO, headers);
+
+        ResponseEntity<List> response = restTemplate.exchange(
+                pythonApiUrl + "/recommend-new-user",
+                HttpMethod.POST,
+                entity,
+                List.class
+        );
+
+        List<Long> recommendedCourseId = response.getBody();
+
+//        List<Long> recommendedCourseId = restTemplate.getForObject(pythonApiUrl + "/recommend-new-user", List.class);
         List<Course> courses = courseRepository.findCoursesByIds(recommendedCourseId);
 
         List<Long> teacherIds = courses.stream()
